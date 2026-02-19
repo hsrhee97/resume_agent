@@ -11,14 +11,22 @@ from langgraph.graph import END, START, StateGraph
 from .constants import (
     CLASSIFICATION_QUERY,
     INSIGHT_EXTRACTION_PROMPT,
+    JOB_POSTING_SCHEMA_OUTLINE,
     SCALE_QUERY_TEMPLATES,
+    USER_PROFILE_SCHEMA_OUTLINE,
 )
 from .heuristics import _extract_ceo_name, _fallback_insights, classify_scale_from_text
 from .search import SearchResult, WebSearchClient, fetch_markdown_via_jina
 from .types import InsightHooks, LLMInvokeData, RawResearchItem, ResearchState, Scale
 
 
-def create_initial_state(company_name: str, team_name: str, role_name: str) -> ResearchState:
+def create_initial_state(
+    company_name: str,
+    team_name: str,
+    role_name: str,
+    job_posting: Optional[dict[str, Any]] = None,
+    user_profile: Optional[dict[str, Any]] = None,
+) -> ResearchState:
     return {
         "company_info": {
             "name": company_name,
@@ -42,6 +50,8 @@ def create_initial_state(company_name: str, team_name: str, role_name: str) -> R
             "errors": [],
             "warnings": [],
         },
+        "job_posting": job_posting if isinstance(job_posting, dict) else {},
+        "user_profile": user_profile if isinstance(user_profile, dict) else {},
     }
 
 
@@ -113,6 +123,124 @@ def _coerce_insights(data: Optional[dict[str, Any]]) -> Optional[InsightHooks]:
     }
 
 
+def _json_context(data: dict[str, Any], max_chars: int = 6_000) -> str:
+    if not data:
+        return "없음"
+    try:
+        raw = json.dumps(data, ensure_ascii=False, indent=2)
+    except Exception:
+        raw = str(data)
+    if len(raw) <= max_chars:
+        return raw
+    return raw[:max_chars] + "\n...(truncated)"
+
+
+def _normalize_query_term(value: Any, max_len: int = 40) -> str:
+    text = str(value or "").strip()
+    text = re.sub(r"\s+", " ", text)
+    return text[:max_len]
+
+
+def _extract_terms(value: Any, limit: int = 4) -> list[str]:
+    if isinstance(value, list):
+        out: list[str] = []
+        for item in value:
+            term = _normalize_query_term(item)
+            if term:
+                out.append(term)
+            if len(out) >= limit:
+                break
+        return out
+    return []
+
+
+def _build_posting_queries(company_name: str, job_posting: dict[str, Any]) -> list[str]:
+    if not isinstance(job_posting, dict):
+        return []
+
+    company_block = job_posting.get("company")
+    position_block = job_posting.get("position")
+    requirements = job_posting.get("requirements")
+
+    if not isinstance(position_block, dict):
+        position_block = {}
+    if not isinstance(requirements, dict):
+        requirements = {}
+
+    position_title = _normalize_query_term(position_block.get("title"))
+    department = _normalize_query_term(position_block.get("department"))
+    tech_stack = _extract_terms(requirements.get("tech_stack"), limit=4)
+    main_tasks = _extract_terms(requirements.get("main_tasks"), limit=2)
+    talent_keywords = _extract_terms(job_posting.get("talent_keywords"), limit=4)
+
+    queries: list[str] = []
+    if position_title or department or tech_stack:
+        query = " ".join(
+            part
+            for part in (
+                company_name,
+                position_title,
+                department,
+                "기술스택",
+                " ".join(tech_stack),
+            )
+            if part
+        )
+        queries.append(query.strip())
+
+    if position_title or main_tasks:
+        query = " ".join(
+            part
+            for part in (
+                company_name,
+                position_title,
+                "주요업무",
+                " ".join(main_tasks),
+                "실제 프로젝트",
+            )
+            if part
+        )
+        queries.append(query.strip())
+
+    if talent_keywords:
+        queries.append(f"{company_name} 인재상 조직문화 {' '.join(talent_keywords)}")
+
+    if isinstance(company_block, dict):
+        industry = _normalize_query_term(company_block.get("industry"))
+        if industry:
+            queries.append(f"{company_name} {industry} 최근 사업 방향")
+
+    deduped: list[str] = []
+    seen: set[str] = set()
+    for query in queries:
+        normalized = query.strip()
+        if not normalized:
+            continue
+        if normalized in seen:
+            continue
+        seen.add(normalized)
+        deduped.append(normalized)
+    return deduped[:3]
+
+
+def _build_classifier_evidence_from_posting(job_posting: dict[str, Any]) -> str:
+    if not isinstance(job_posting, dict):
+        return ""
+
+    company_block = job_posting.get("company")
+    if not isinstance(company_block, dict):
+        return ""
+
+    parts: list[str] = []
+    size = company_block.get("size")
+    industry = company_block.get("industry")
+    if isinstance(size, str) and size.strip():
+        parts.append(f"회사규모: {size.strip()}")
+    if isinstance(industry, str) and industry.strip():
+        parts.append(f"산업: {industry.strip()}")
+    return "\n".join(parts)
+
+
 def build_research_graph(
     search_client: WebSearchClient,
     llm: Any = None,
@@ -146,7 +274,6 @@ def build_research_graph(
             )
 
         evidence_parts: list[str] = []
-
         for result in search_results:
             evidence_parts.append(f"{result.title} {result.snippet}")
             raw_data.append(
@@ -158,6 +285,10 @@ def build_research_graph(
                     "snippet": result.snippet,
                 }
             )
+
+        posting_evidence = _build_classifier_evidence_from_posting(state.get("job_posting", {}))
+        if posting_evidence:
+            evidence_parts.append(posting_evidence)
 
         evidence_text = "\n".join(evidence_parts)
         scale = classify_scale_from_text(evidence_text)
@@ -185,25 +316,37 @@ def build_research_graph(
         log(f"[Research] scale={scale} ceo_guess={ceo_name}")
 
         templates = SCALE_QUERY_TEMPLATES.get(scale, SCALE_QUERY_TEMPLATES["Startup"])
-
-        seen_urls = {item.get("url", "") for item in raw_data if item.get("url")}
-        for template in templates:
-            query = template.format(
+        query_candidates = [
+            template.format(
                 company_name=company["name"],
                 team_name=company["team"],
                 role_name=company["role"],
                 ceo_name=ceo_name,
             )
-            log(f"[Research] query={query}")
-            search_results, search_error = _safe_search(search_client, query, k=per_query_results)
+            for template in templates
+        ]
+        query_candidates.extend(_build_posting_queries(company["name"], state.get("job_posting", {})))
+
+        seen_urls = {item.get("url", "") for item in raw_data if item.get("url")}
+        seen_queries: set[str] = set()
+        for query in query_candidates:
+            normalized_query = query.strip()
+            if not normalized_query or normalized_query in seen_queries:
+                continue
+            seen_queries.add(normalized_query)
+
+            log(f"[Research] query={normalized_query}")
+            search_results, search_error = _safe_search(
+                search_client, normalized_query, k=per_query_results
+            )
             log(f"[Research] results={len(search_results)}")
             if search_error:
                 diagnostics["errors"].append(
-                    f"adaptive search failed for query='{query}': {search_error}"
+                    f"adaptive search failed for query='{normalized_query}': {search_error}"
                 )
             if not search_results:
                 diagnostics["warnings"].append(
-                    f"adaptive search returned 0 results for query: {query}"
+                    f"adaptive search returned 0 results for query: {normalized_query}"
                 )
 
             for result in search_results:
@@ -223,7 +366,7 @@ def build_research_graph(
                 raw_data.append(
                     {
                         "stage": "adaptive_research",
-                        "query": query,
+                        "query": normalized_query,
                         "title": result.title,
                         "url": result.url,
                         "snippet": result.snippet,
@@ -243,15 +386,28 @@ def build_research_graph(
         company = state["company_info"]
         scale = state.get("scale") or "Startup"
         raw_data = state.get("raw_research_data", [])
+        job_posting = state.get("job_posting", {})
+        user_profile = state.get("user_profile", {})
         diagnostics = dict(state.get("diagnostics", {"errors": [], "warnings": []}))
         diagnostics.setdefault("errors", [])
         diagnostics.setdefault("warnings", [])
 
         research_context = _build_research_context(raw_data)
+        job_posting_context = _json_context(job_posting)
+        user_profile_context = _json_context(user_profile)
         log(f"[Insight] context_chars={len(research_context)} llm={'on' if llm else 'off'}")
+
         if not research_context.strip():
             diagnostics["warnings"].append(
                 "no research context available; using fallback insight generation."
+            )
+        if not job_posting:
+            diagnostics["warnings"].append(
+                "job_posting input is empty; insight quality may degrade."
+            )
+        if not user_profile:
+            diagnostics["warnings"].append(
+                "user_profile input is empty; personal-fit hooks will avoid inference."
             )
 
         insights: Optional[InsightHooks] = None
@@ -267,6 +423,10 @@ def build_research_graph(
                 team_name=company["team"],
                 role_name=company["role"],
                 scale=scale,
+                user_profile_schema_outline=USER_PROFILE_SCHEMA_OUTLINE or "스키마 정보 없음",
+                job_posting_schema_outline=JOB_POSTING_SCHEMA_OUTLINE or "스키마 정보 없음",
+                job_posting_context=job_posting_context,
+                user_profile_context=user_profile_context,
                 research_context=research_context,
             )
             try:
@@ -298,6 +458,7 @@ def build_research_graph(
                 team_name=company["team"],
                 role_name=company["role"],
                 research_context=research_context,
+                user_profile=user_profile if isinstance(user_profile, dict) else None,
             )
 
         return {"insights": insights, "llm_invoke": llm_invoke, "diagnostics": diagnostics}

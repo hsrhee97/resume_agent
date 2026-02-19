@@ -1,0 +1,46 @@
+{
+  "company_info": {
+    "name": "뤼튼테크놀로지스",
+    "team": "AX CIC",
+    "role": "Agentic AI 개발자"
+  },
+  "scale": "Startup",
+  "insights": {
+    "business_hook": "뤼튼테크놀로지스의 최근 사업 방향과 '데이터 분석 및 시각화 기술을 활용하여 사회 문제 해결 프로젝트를 진행'를 연결해 Agentic AI 개발자 지원 동기를 구성하세요.",
+    "tech_hook": "AX CIC 팀의 기술 과제에 대해 지원자 기술 스택(LangChain, LangGraph, Python, JavaScript, HTML/CSS, PHP)을 중심으로 해결 시나리오를 연결하세요.",
+    "culture_hook": "뤼튼테크놀로지스의 협업 방식과 지원자 협업 스타일('기술적 깊이와 협업 능력을 바탕으로 조직의 생산성 혁신과 목표 달성에 기여하고 싶습니다.')의 접점을 구체 사례 중심으로 작성하세요."
+  },
+  "llm_invoke": {
+    "invoked": false,
+    "raw_response": "",
+    "parse_success": false,
+    "used_fallback": true,
+    "error": "LLM not invoked or no usable research context."
+  },
+  "diagnostics": {
+    "errors": [
+      "classifier search failed: ProxyError: HTTPSConnectionPool(host='api.tavily.com', port=443): Max retries exceeded with url: /search (Caused by ProxyError('Unable to connect to proxy', NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x00000231AAD978C0>: Failed to establish a new connection: [WinError 10061] 대상 컴퓨터에서 연결을 거부했으므로 연결하지 못했습니다')))",
+      "adaptive search failed for query='뤼튼테크놀로지스 서비스 사용자 후기 페인포인트': ProxyError: HTTPSConnectionPool(host='api.tavily.com', port=443): Max retries exceeded with url: /search (Caused by ProxyError('Unable to connect to proxy', NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x00000231ABDFF890>: Failed to establish a new connection: [WinError 10061] 대상 컴퓨터에서 연결을 거부했으므로 연결하지 못했습니다')))",
+      "adaptive search failed for query='뤼튼테크놀로지스 대표 인터뷰 비전 뤼튼테크놀로지스': ProxyError: HTTPSConnectionPool(host='api.tavily.com', port=443): Max retries exceeded with url: /search (Caused by ProxyError('Unable to connect to proxy', NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x00000231ABE442D0>: Failed to establish a new connection: [WinError 10061] 대상 컴퓨터에서 연결을 거부했으므로 연결하지 못했습니다')))",
+      "adaptive search failed for query='뤼튼테크놀로지스 Agentic AI 개발자 AX CIC 기술스택 Python Node.js OpenAI SDK Vercel AI SDK': ProxyError: HTTPSConnectionPool(host='api.tavily.com', port=443): Max retries exceeded with url: /search (Caused by ProxyError('Unable to connect to proxy', NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x00000231ABE44550>: Failed to establish a new connection: [WinError 10061] 대상 컴퓨터에서 연결을 거부했으므로 연결하지 못했습니다')))",
+      "adaptive search failed for query='뤼튼테크놀로지스 Agentic AI 개발자 주요업무 기업, 공공기관 등 클라이언트 요구사항에 따른 Agentic AI 개발을 효과적인 Agentic AI 구축에 필요한 MCP 서버 구축 및 Agen 실제 프로젝트': ProxyError: HTTPSConnectionPool(host='api.tavily.com', port=443): Max retries exceeded with url: /search (Caused by ProxyError('Unable to connect to proxy', NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x00000231ABE447D0>: Failed to establish a new connection: [WinError 10061] 대상 컴퓨터에서 연결을 거부했으므로 연결하지 못했습니다')))",
+      "adaptive search failed for query='뤼튼테크놀로지스 인재상 조직문화 딥러닝 AI 기술 연구자 마인드셋 빠른 학습능력': ProxyError: HTTPSConnectionPool(host='api.tavily.com', port=443): Max retries exceeded with url: /search (Caused by ProxyError('Unable to connect to proxy', NewConnectionError('<urllib3.connection.HTTPSConnection object at 0x00000231ABE44A50>: Failed to establish a new connection: [WinError 10061] 대상 컴퓨터에서 연결을 거부했으므로 연결하지 못했습니다')))"
+    ],
+    "warnings": [
+      "classifier returned 0 results for query: 뤼튼테크놀로지스 매출액 사원수 상장여부 투자단계",
+      "adaptive search returned 0 results for query: 뤼튼테크놀로지스 서비스 사용자 후기 페인포인트",
+      "adaptive search returned 0 results for query: 뤼튼테크놀로지스 대표 인터뷰 비전 뤼튼테크놀로지스",
+      "adaptive search returned 0 results for query: 뤼튼테크놀로지스 Agentic AI 개발자 AX CIC 기술스택 Python Node.js OpenAI SDK Vercel AI SDK",
+      "adaptive search returned 0 results for query: 뤼튼테크놀로지스 Agentic AI 개발자 주요업무 기업, 공공기관 등 클라이언트 요구사항에 따른 Agentic AI 개발을 효과적인 Agentic AI 구축에 필요한 MCP 서버 구축 및 Agen 실제 프로젝트",
+      "adaptive search returned 0 results for query: 뤼튼테크놀로지스 인재상 조직문화 딥러닝 AI 기술 연구자 마인드셋 빠른 학습능력",
+      "adaptive research collected 0 sources; insights may be fallback-only.",
+      "no research context available; using fallback insight generation."
+    ]
+  },
+  "result_valid": false,
+  "input_context": {
+    "job_posting_attached": true,
+    "user_profile_attached": true
+  },
+  "reference_urls": []
+}

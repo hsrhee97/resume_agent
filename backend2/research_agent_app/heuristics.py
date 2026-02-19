@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import re
-from typing import Iterable, Optional
+from typing import Any, Iterable, Optional
 
 from .constants import (
     KOSDAQ_KEYWORDS,
@@ -150,11 +150,128 @@ def _pick_sentence(text: str, keywords: Iterable[str]) -> Optional[str]:
     return None
 
 
+def _normalize_text(value: Any) -> str:
+    if value is None:
+        return ""
+    return str(value).strip()
+
+
+def _flatten_strings(value: Any) -> list[str]:
+    if isinstance(value, str):
+        text = value.strip()
+        return [text] if text else []
+    if isinstance(value, list):
+        out: list[str] = []
+        for item in value:
+            out.extend(_flatten_strings(item))
+        return out
+    if isinstance(value, dict):
+        out: list[str] = []
+        for item in value.values():
+            out.extend(_flatten_strings(item))
+        return out
+    return []
+
+
+def _pick_profile_tech_summary(user_profile: Optional[dict[str, Any]]) -> str:
+    if not isinstance(user_profile, dict):
+        return ""
+    tech_stack = user_profile.get("tech_stack")
+    if not isinstance(tech_stack, dict):
+        return ""
+
+    ordered_keys = (
+        "ai_agent_ecosystem",
+        "languages",
+        "llm_ops",
+        "data_science_ml",
+        "databases",
+        "collaboration_tools",
+    )
+    candidates: list[str] = []
+    for key in ordered_keys:
+        values = _flatten_strings(tech_stack.get(key))
+        candidates.extend(values)
+
+    deduped: list[str] = []
+    seen: set[str] = set()
+    for item in candidates:
+        lowered = item.lower()
+        if lowered in seen:
+            continue
+        seen.add(lowered)
+        deduped.append(item)
+        if len(deduped) >= 6:
+            break
+
+    return ", ".join(deduped)
+
+
+def _pick_profile_collab_style(user_profile: Optional[dict[str, Any]]) -> str:
+    if not isinstance(user_profile, dict):
+        return ""
+
+    background = user_profile.get("background")
+    if isinstance(background, dict):
+        core_identity = background.get("core_identity")
+        if isinstance(core_identity, dict):
+            value = _normalize_text(core_identity.get("working_philosophy"))
+            if value:
+                return value
+
+        conflict_resolution = background.get("conflict_resolution")
+        if isinstance(conflict_resolution, list):
+            for item in conflict_resolution:
+                if not isinstance(item, dict):
+                    continue
+                value = _normalize_text(item.get("communication_skill"))
+                if value:
+                    return value
+
+    profile_block = user_profile.get("user_profile")
+    if isinstance(profile_block, dict):
+        summary = _normalize_text(profile_block.get("summary"))
+        if summary:
+            return summary
+    return ""
+
+
+def _pick_profile_motivation(user_profile: Optional[dict[str, Any]]) -> str:
+    if not isinstance(user_profile, dict):
+        return ""
+
+    background = user_profile.get("background")
+    if isinstance(background, dict):
+        future_contribution = background.get("future_contribution")
+        if isinstance(future_contribution, dict):
+            short_term = future_contribution.get("short_term")
+            if isinstance(short_term, dict):
+                goal = _normalize_text(short_term.get("goal"))
+                if goal:
+                    return goal
+
+            transferable = _flatten_strings(future_contribution.get("transferable_strengths"))
+            if transferable:
+                return ", ".join(transferable[:3])
+
+            domain_fit = _flatten_strings(future_contribution.get("domain_fit_keywords"))
+            if domain_fit:
+                return ", ".join(domain_fit[:3])
+
+    profile_block = user_profile.get("user_profile")
+    if isinstance(profile_block, dict):
+        summary = _normalize_text(profile_block.get("summary"))
+        if summary:
+            return summary
+    return ""
+
+
 def _fallback_insights(
     company_name: str,
     team_name: str,
     role_name: str,
     research_context: str,
+    user_profile: Optional[dict[str, Any]] = None,
 ) -> InsightHooks:
     business = _pick_sentence(
         research_context,
@@ -169,11 +286,39 @@ def _fallback_insights(
         ("문화", "협업", "인재", "가치", "원칙", "소통", "고객 중심"),
     )
 
+    motivation = _pick_profile_motivation(user_profile)
+    tech_summary = _pick_profile_tech_summary(user_profile)
+    collab_style = _pick_profile_collab_style(user_profile)
+
+    if motivation:
+        business_default = (
+            f"{company_name}의 최근 사업 방향과 '{motivation}'를 연결해 {role_name} 지원 동기를 구성하세요."
+        )
+    else:
+        business_default = (
+            f"{company_name}의 최근 사업 방향을 정리하고, 지원 동기는 제공된 사용자 정보 범위 내에서만 작성하세요."
+        )
+
+    if tech_summary:
+        tech_default = (
+            f"{team_name} 팀의 기술 과제에 대해 지원자 기술 스택({tech_summary})을 중심으로 해결 시나리오를 연결하세요."
+        )
+    else:
+        tech_default = (
+            f"{team_name} 팀의 기술 과제를 정리하고, 지원자 기술 스택 정보가 부족함을 명시한 뒤 추가 정보가 필요하다고 작성하세요."
+        )
+
+    if collab_style:
+        culture_default = (
+            f"{company_name}의 협업 방식과 지원자 협업 스타일('{collab_style}')의 접점을 구체 사례 중심으로 작성하세요."
+        )
+    else:
+        culture_default = (
+            f"{company_name}의 협업 방식은 요약하되, 지원자 협업 스타일 정보가 부족함을 명시하고 보완 포인트를 제안하세요."
+        )
+
     return {
-        "business_hook": business
-        or f"{company_name}의 최근 사업 방향과 {role_name} 지원 동기를 하나의 성장 스토리로 연결하세요.",
-        "tech_hook": tech
-        or f"{team_name} 팀의 기술 과제를 정리하고 본인의 핵심 기술 스택으로 해결 시나리오를 제시하세요.",
-        "culture_hook": culture
-        or f"{company_name}의 협업 방식에 맞춰 본인의 협업 습관과 커뮤니케이션 원칙을 구체 사례로 매칭하세요.",
+        "business_hook": business or business_default,
+        "tech_hook": tech or tech_default,
+        "culture_hook": culture or culture_default,
     }

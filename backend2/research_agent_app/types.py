@@ -47,3 +47,5 @@ class ResearchState(TypedDict):
     insights: InsightHooks
     llm_invoke: LLMInvokeData
     diagnostics: Diagnostics
+    user_profile: dict[str, Any]
+    job_posting: dict[str, Any]

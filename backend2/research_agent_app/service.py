@@ -1,7 +1,7 @@
 from __future__ import annotations
 
 import os
-from typing import Any
+from typing import Any, Optional
 
 from dotenv import load_dotenv
 
@@ -45,6 +45,10 @@ def format_output_json(state: ResearchState) -> dict[str, Any]:
         "llm_invoke": llm_invoke,
         "diagnostics": diagnostics,
         "result_valid": result_valid,
+        "input_context": {
+            "job_posting_attached": bool(state.get("job_posting")),
+            "user_profile_attached": bool(state.get("user_profile")),
+        },
         "reference_urls": urls,
     }
 
@@ -53,11 +57,19 @@ def run_research(
     company_name: str,
     team_name: str,
     role_name: str,
+    job_posting: Optional[dict[str, Any]] = None,
+    user_profile: Optional[dict[str, Any]] = None,
     provider: str = "tavily",
     model: str = "gpt-4.1-mini",
     verbose: bool = False,
 ) -> dict[str, Any]:
-    initial_state = create_initial_state(company_name, team_name, role_name)
+    initial_state = create_initial_state(
+        company_name,
+        team_name,
+        role_name,
+        job_posting=job_posting,
+        user_profile=user_profile,
+    )
     search_client = WebSearchClient(provider=provider)
     llm = create_default_llm(model=model)
     graph = build_research_graph(search_client=search_client, llm=llm, verbose=verbose)

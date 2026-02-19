@@ -1,24 +1,24 @@
 {
   "company_info": {
-    "name": "네이버",
-    "team": "검색플랫폼",
-    "role": "백엔드"
+    "name": "뤼튼테크놀로지스",
+    "team": "AX CIC",
+    "role": "Agentic AI 개발자"
   },
-  "scale": "Large",
+  "scale": "Startup",
   "insights": {
-    "business_hook": "네이버가 AI와 검색 플랫폼 고도화를 통해 국내 1위 인터넷 포털의 경쟁우위를 유지하며, 커머스와 콘텐츠 등 다각화된 수익기반을 확장하는 전략에 깊이 공감하며, 이러한 성장 동력에 기여하고자 지원합니다.",
-    "tech_hook": "검색플랫폼 팀이 방대한 데이터 처리와 실시간 검색 최적화, AI 기술 접목에 집중하는 만큼, 대용량 분산 시스템과 마이크로서비스 아키텍처 경험을 바탕으로 안정적이고 확장성 높은 백엔드 시스템 개발에 기여할 수 있습니다.",
-    "culture_hook": "네이버가 긍정적이고 유연한 조직문화 속에서 협업과 실험을 중시하는 만큼, 저는 팀원들과 열린 소통과 적극적인 피드백을 통해 함께 성장하며 혁신을 만들어가는 협업 스타일을 지향합니다."
+    "business_hook": "AI로 사람들의 삶을 혁신하고 국내 최대 LLM 기반 B2C 서비스 '뤼튼'을 선도하는 뤼튼테크놀로지스의 AX CIC 팀에서, 저는 LLM·LangChain 기술을 활용해 에이전트 설계부터 워크플로우 자동화, 비용 최적화까지 End-to-End 프로세스를 직접 수행해온 경험을 바탕으로, 생성형 AI 산업 혁명을 함께 준비하며 실질적 비즈니스 임팩트를 창출하고자 지원합니다.",
+    "tech_hook": "Python과 OpenAI API, LangChain, LangGraph 등 LLM 관련 라이브러리를 능숙하게 다루며 하이브리드 에이전트 아키텍처 개발과 비용·속도 최적화를 주도한 경험을 통해, 뤼튼테크놀로지스가 요구하는 Agentic AI 개발과 MCP 서버 구축, Agent Orchestration 업무에 즉시 기여할 수 있습니다.",
+    "culture_hook": "깊은 사고력과 창의력, 끈기 있는 자기주도적 연구자 마인드셋을 바탕으로, 반복 업무 병목을 자동화하여 팀 생산성을 향상시키는 등 정확한 소통과 높은 업무 강도에 대한 회복 탄력성을 발휘해, 뤼튼테크놀로지스의 빠르게 시도하고 실패에서 배우며 성공에 집중하는 문화에 잘 부합합니다."
   },
   "llm_invoke": {
     "invoked": true,
-    "raw_response": "{\n  \"business_hook\": \"네이버가 AI와 검색 플랫폼 고도화를 통해 국내 1위 인터넷 포털의 경쟁우위를 유지하며, 커머스와 콘텐츠 등 다각화된 수익기반을 확장하는 전략에 깊이 공감하며, 이러한 성장 동력에 기여하고자 지원합니다.\",\n  \"tech_hook\": \"검색플랫폼 팀이 방대한 데이터 처리와 실시간 검색 최적화, AI 기술 접목에 집중하는 만큼, 대용량 분산 시스템과 마이크로서비스 아키텍처 경험을 바탕으로 안정적이고 확장성 높은 백엔드 시스템 개발에 기여할 수 있습니다.\",\n  \"culture_hook\": \"네이버가 긍정적이고 유연한 조직문화 속에서 협업과 실험을 중시하는 만큼, 저는 팀원들과 열린 소통과 적극적인 피드백을 통해 함께 성장하며 혁신을 만들어가는 협업 스타일을 지향합니다.\"\n}",
+    "raw_response": "{\n  \"business_hook\": \"AI로 사람들의 삶을 혁신하고 국내 최대 LLM 기반 B2C 서비스 '뤼튼'을 선도하는 뤼튼테크놀로지스의 AX CIC 팀에서, 저는 LLM·LangChain 기술을 활용해 에이전트 설계부터 워크플로우 자동화, 비용 최적화까지 End-to-End 프로세스를 직접 수행해온 경험을 바탕으로, 생성형 AI 산업 혁명을 함께 준비하며 실질적 비즈니스 임팩트를 창출하고자 지원합니다.\",\n  \"tech_hook\": \"Python과 OpenAI API, LangChain, LangGraph 등 LLM 관련 라이브러리를 능숙하게 다루며 하이브리드 에이전트 아키텍처 개발과 비용·속도 최적화를 주도한 경험을 통해, 뤼튼테크놀로지스가 요구하는 Agentic AI 개발과 MCP 서버 구축, Agent Orchestration 업무에 즉시 기여할 수 있습니다.\",\n  \"culture_hook\": \"깊은 사고력과 창의력, 끈기 있는 자기주도적 연구자 마인드셋을 바탕으로, 반복 업무 병목을 자동화하여 팀 생산성을 향상시키는 등 정확한 소통과 높은 업무 강도에 대한 회복 탄력성을 발휘해, 뤼튼테크놀로지스의 빠르게 시도하고 실패에서 배우며 성공에 집중하는 문화에 잘 부합합니다.\"\n}",
     "parse_success": true,
     "used_fallback": false,
     "parsed_json": {
-      "business_hook": "네이버가 AI와 검색 플랫폼 고도화를 통해 국내 1위 인터넷 포털의 경쟁우위를 유지하며, 커머스와 콘텐츠 등 다각화된 수익기반을 확장하는 전략에 깊이 공감하며, 이러한 성장 동력에 기여하고자 지원합니다.",
-      "tech_hook": "검색플랫폼 팀이 방대한 데이터 처리와 실시간 검색 최적화, AI 기술 접목에 집중하는 만큼, 대용량 분산 시스템과 마이크로서비스 아키텍처 경험을 바탕으로 안정적이고 확장성 높은 백엔드 시스템 개발에 기여할 수 있습니다.",
-      "culture_hook": "네이버가 긍정적이고 유연한 조직문화 속에서 협업과 실험을 중시하는 만큼, 저는 팀원들과 열린 소통과 적극적인 피드백을 통해 함께 성장하며 혁신을 만들어가는 협업 스타일을 지향합니다."
+      "business_hook": "AI로 사람들의 삶을 혁신하고 국내 최대 LLM 기반 B2C 서비스 '뤼튼'을 선도하는 뤼튼테크놀로지스의 AX CIC 팀에서, 저는 LLM·LangChain 기술을 활용해 에이전트 설계부터 워크플로우 자동화, 비용 최적화까지 End-to-End 프로세스를 직접 수행해온 경험을 바탕으로, 생성형 AI 산업 혁명을 함께 준비하며 실질적 비즈니스 임팩트를 창출하고자 지원합니다.",
+      "tech_hook": "Python과 OpenAI API, LangChain, LangGraph 등 LLM 관련 라이브러리를 능숙하게 다루며 하이브리드 에이전트 아키텍처 개발과 비용·속도 최적화를 주도한 경험을 통해, 뤼튼테크놀로지스가 요구하는 Agentic AI 개발과 MCP 서버 구축, Agent Orchestration 업무에 즉시 기여할 수 있습니다.",
+      "culture_hook": "깊은 사고력과 창의력, 끈기 있는 자기주도적 연구자 마인드셋을 바탕으로, 반복 업무 병목을 자동화하여 팀 생산성을 향상시키는 등 정확한 소통과 높은 업무 강도에 대한 회복 탄력성을 발휘해, 뤼튼테크놀로지스의 빠르게 시도하고 실패에서 배우며 성공에 집중하는 문화에 잘 부합합니다."
     }
   },
   "diagnostics": {
@@ -26,18 +26,33 @@
     "warnings": []
   },
   "result_valid": true,
+  "input_context": {
+    "job_posting_attached": true,
+    "user_profile_attached": true
+  },
   "reference_urls": [
-    "https://biz.sbs.co.kr/article/20000210281",
-    "https://blog.naver.com/PostView.nhn?blogId=naver_diary&logNo=222175642965",
-    "https://dongmin-jang.medium.com/%EC%97%85%EC%B2%B4%EB%B3%84-%EA%B8%B0%EC%88%A0-%EB%B8%94%EB%A1%9C%EA%B7%B8-%EB%A6%AC%EC%8A%A4%ED%8A%B8-e2d736d0e658",
-    "https://jobsnworks.tistory.com/106",
-    "https://m.blog.naver.com/sonwbsy/223035903480",
-    "https://m.kisrating.com/fileDown.do?menuCd=R8&gubun=2&fileName=rs20240627-34.pdf",
-    "https://medium.com/naver-dna-tech-blog",
-    "https://naver-career.gitbook.io/kr/service/search",
-    "https://www.economidaily.com/view/20250102165952084",
-    "https://www.mk.co.kr/news/it/10911967",
-    "https://www.mt.co.kr/tech/2024/01/02/2024010211254538002",
-    "https://www.navercorp.com/navercorp_/ir/businessReport/2023/NAVER_business_report_2022.pdf"
+    "https://aws.amazon.com/ko/blogs/tech/agentic-ai-foundation-platform-part1/",
+    "https://career.rememberapp.co.kr/job/posting/292320",
+    "https://emilyxiong.medium.com/create-an-ai-agent-with-vercel-ai-sdk-e690b807eb2a",
+    "https://github.com/vercel/ai",
+    "https://ikoa.tistory.com/entry/%EB%A4%BC%ED%8A%BC-wrtn-%EA%B8%80%EC%93%B0%EB%8A%94-AI-%EC%B9%B4%ED%94%BC%EB%9D%BC%EC%9D%B4%ED%8C%85-AI%EC%82%AC%EC%9A%A9-%ED%9B%84%EA%B8%B0%EB%B8%94%EB%A1%9C%EA%B7%B8-%ED%8F%AC%EC%8A%A4%ED%8C%85-%EC%86%8C%EA%B0%9C%EA%B8%80-%EA%B4%91%EA%B3%A0%EB%AC%B8%EA%B5%AC",
+    "https://kr.linkedin.com/posts/teddy-lee_%EB%A4%BC%ED%8A%BC-30-%EC%97%90-%EB%8C%80%ED%95%9C-%EC%83%9D%EA%B0%81%EC%A0%95%EB%A6%AC-%EC%B5%9C%EA%B7%BC-%EB%A4%BC%ED%8A%BC%ED%85%8C%ED%81%AC%EB%86%80%EB%A1%9C%EC%A7%80%EC%8A%A4%EC%97%90%EC%84%9C-%EB%A4%BC%ED%8A%BC-30%EC%9D%84-activity-7334225261929930753-T-od",
+    "https://m.blog.naver.com/PostView.naver?blogId=edutech_phd&logNo=223543357707",
+    "https://openai.github.io/openai-agents-python/",
+    "https://platum.kr/archives/256678",
+    "https://revf.tistory.com/311",
+    "https://thevc.kr/wrtntechnologies",
+    "https://thevc.kr/wrtntechnologies/fundings",
+    "https://vercel.com/docs/ai-sdk",
+    "https://wowtale.net/2025/04/08/239517/",
+    "https://wrtn.io/wp-content/uploads/2025/04/250424_%EB%B3%B4%EB%8F%84%EC%9E%90%EB%A3%8C_%EB%A4%BC%ED%8A%BC%ED%85%8C%ED%81%AC%EB%86%80%EB%A1%9C%EC%A7%80%EC%8A%A4-%E2%80%98%EC%83%9D%ED%99%9C%ED%98%95-AI-%EC%8B%9C%EB%8C%80-%EC%9D%B4%EB%81%8C-%E2%80%98%EC%BF%BC%ED%84%B0%EB%B0%B1-%EC%9D%B8%EC%9E%AC-%EC%B0%BE%EB%8A%94%EB%8B%A4.pdf",
+    "https://www.aitimes.com/news/articleView.html?idxno=169432",
+    "https://www.instagram.com/p/DAh_pXXzz8E/",
+    "https://www.jenova.ai/ko/resources/create-ai-agent",
+    "https://www.linkedin.com/posts/wrtn-technologies-inc_in-10-years-ai-will-be-as-essential-as-electricity-activity-7292054786596589568-TVUL",
+    "https://www.saramin.co.kr/zf_user/company-info/view/csn/VGNnVmx2NFJsM3gyR2ptL25RdUF3UT09/company_nm/(%EC%A3%BC)%EB%A4%BC%ED%8A%BC%ED%85%8C%ED%81%AC%EB%86%80%EB%A1%9C%EC%A7%80%EC%8A%A4?srsltid=AfmBOoqJ6o1Eu2GmLJrGliTqbPOGUpyiPr44is-4VoboKWdkTydGYSOV",
+    "https://www.saramin.co.kr/zf_user/company-info/view/csn/VGNnVmx2NFJsM3gyR2ptL25RdUF3UT09/company_nm/(%EC%A3%BC)%EB%A4%BC%ED%8A%BC%ED%85%8C%ED%81%AC%EB%86%80%EB%A1%9C%EC%A7%80%EC%8A%A4?srsltid=AfmBOorXv6UxiIpRLnyPnuECsvdtNLeyKqpfgjQCMDnmfu21Dfyryl0K",
+    "https://www.techfocus.kr/theme/basic/pdf/2023/202305.pdf",
+    "https://yozm.wishket.com/magazine/detail/3213/"
   ]
 }
