@@ -1,0 +1,43 @@
+{
+  "company_info": {
+    "name": "네이버",
+    "team": "검색플랫폼",
+    "role": "백엔드"
+  },
+  "scale": "Large",
+  "insights": {
+    "business_hook": "네이버가 AI와 검색 플랫폼 고도화를 통해 국내 1위 인터넷 포털의 경쟁우위를 유지하며, 커머스와 콘텐츠 등 다각화된 수익기반을 확장하는 전략에 깊이 공감하며, 이러한 성장 동력에 기여하고자 지원합니다.",
+    "tech_hook": "검색플랫폼 팀이 방대한 데이터 처리와 실시간 검색 최적화, AI 기술 접목에 집중하는 만큼, 대용량 분산 시스템과 마이크로서비스 아키텍처 경험을 바탕으로 안정적이고 확장성 높은 백엔드 시스템 개발에 기여할 수 있습니다.",
+    "culture_hook": "네이버가 긍정적이고 유연한 조직문화 속에서 협업과 실험을 중시하는 만큼, 저는 팀원들과 열린 소통과 적극적인 피드백을 통해 함께 성장하며 혁신을 만들어가는 협업 스타일을 지향합니다."
+  },
+  "llm_invoke": {
+    "invoked": true,
+    "raw_response": "{\n  \"business_hook\": \"네이버가 AI와 검색 플랫폼 고도화를 통해 국내 1위 인터넷 포털의 경쟁우위를 유지하며, 커머스와 콘텐츠 등 다각화된 수익기반을 확장하는 전략에 깊이 공감하며, 이러한 성장 동력에 기여하고자 지원합니다.\",\n  \"tech_hook\": \"검색플랫폼 팀이 방대한 데이터 처리와 실시간 검색 최적화, AI 기술 접목에 집중하는 만큼, 대용량 분산 시스템과 마이크로서비스 아키텍처 경험을 바탕으로 안정적이고 확장성 높은 백엔드 시스템 개발에 기여할 수 있습니다.\",\n  \"culture_hook\": \"네이버가 긍정적이고 유연한 조직문화 속에서 협업과 실험을 중시하는 만큼, 저는 팀원들과 열린 소통과 적극적인 피드백을 통해 함께 성장하며 혁신을 만들어가는 협업 스타일을 지향합니다.\"\n}",
+    "parse_success": true,
+    "used_fallback": false,
+    "parsed_json": {
+      "business_hook": "네이버가 AI와 검색 플랫폼 고도화를 통해 국내 1위 인터넷 포털의 경쟁우위를 유지하며, 커머스와 콘텐츠 등 다각화된 수익기반을 확장하는 전략에 깊이 공감하며, 이러한 성장 동력에 기여하고자 지원합니다.",
+      "tech_hook": "검색플랫폼 팀이 방대한 데이터 처리와 실시간 검색 최적화, AI 기술 접목에 집중하는 만큼, 대용량 분산 시스템과 마이크로서비스 아키텍처 경험을 바탕으로 안정적이고 확장성 높은 백엔드 시스템 개발에 기여할 수 있습니다.",
+      "culture_hook": "네이버가 긍정적이고 유연한 조직문화 속에서 협업과 실험을 중시하는 만큼, 저는 팀원들과 열린 소통과 적극적인 피드백을 통해 함께 성장하며 혁신을 만들어가는 협업 스타일을 지향합니다."
+    }
+  },
+  "diagnostics": {
+    "errors": [],
+    "warnings": []
+  },
+  "result_valid": true,
+  "reference_urls": [
+    "https://biz.sbs.co.kr/article/20000210281",
+    "https://blog.naver.com/PostView.nhn?blogId=naver_diary&logNo=222175642965",
+    "https://dongmin-jang.medium.com/%EC%97%85%EC%B2%B4%EB%B3%84-%EA%B8%B0%EC%88%A0-%EB%B8%94%EB%A1%9C%EA%B7%B8-%EB%A6%AC%EC%8A%A4%ED%8A%B8-e2d736d0e658",
+    "https://jobsnworks.tistory.com/106",
+    "https://m.blog.naver.com/sonwbsy/223035903480",
+    "https://m.kisrating.com/fileDown.do?menuCd=R8&gubun=2&fileName=rs20240627-34.pdf",
+    "https://medium.com/naver-dna-tech-blog",
+    "https://naver-career.gitbook.io/kr/service/search",
+    "https://www.economidaily.com/view/20250102165952084",
+    "https://www.mk.co.kr/news/it/10911967",
+    "https://www.mt.co.kr/tech/2024/01/02/2024010211254538002",
+    "https://www.navercorp.com/navercorp_/ir/businessReport/2023/NAVER_business_report_2022.pdf"
+  ]
+}
