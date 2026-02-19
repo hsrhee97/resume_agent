@@ -1,0 +1,66 @@
+{
+  "company": {
+    "name": "뤼튼테크놀로지스",
+    "industry": "IT, 컨텐츠",
+    "size": "",
+    "location": "서울특별시 서초구 서초대로77길 17, 14층"
+  },
+  "position": {
+    "title": "Agentic AI 개발자",
+    "department": "AX CIC",
+    "job_type": "경력",
+    "employment_type": "정규직"
+  },
+  "requirements": {
+    "main_tasks": [
+      "기업, 공공기관 등 클라이언트 요구사항에 따른 Agentic AI 개발을 진행합니다.",
+      "효과적인 Agentic AI 구축에 필요한 MCP 서버 구축 및 Agent Orchestration 업무를 진행합니다.",
+      "팀원분들의 생산성 향상을 위한 Agent 플랫폼 개발을 진행합니다."
+    ],
+    "qualifications": [
+      "어떤 영역에서든 상위 1%의 역량을 증명해보신 분",
+      "Researcher mindset을 가지신 분 (깊은 사고력, 창의력, 끈기 있고 명석한 자기주도형 인재)",
+      "AI 기술에 대한 이해도가 높으신 분. 만약 없더라도, 새로운 지식/기술에 대한 2주 이내 빠른 온보딩에 자신 있으신 분",
+      "삶에 있어서 일이 정말 중요하신 분",
+      "빠른 학습 능력을 가지고 있으신 분",
+      "정확한 소통을 하시는 분",
+      "높은 업무 강도에 대한 회복 탄력성을 가지신 분",
+      "기술을 통한 비즈니스 임팩트를 만들어 보신 분",
+      "Python 혹은 Node.js에 능숙하신 분",
+      "OpenAI SDK, Vercel AI SDK 등 LLM 관련 라이브러리를 활용한 어플리케이션 구현 경험이 있으신 분"
+    ],
+    "preferred": [],
+    "tech_stack": [
+      "Python",
+      "Node.js",
+      "OpenAI SDK",
+      "Vercel AI SDK"
+    ]
+  },
+  "talent_keywords": [
+    "딥러닝",
+    "AI 기술",
+    "연구자 마인드셋",
+    "빠른 학습능력",
+    "정확한 소통",
+    "높은 업무 강도에 대한 회복 탄력성",
+    "기술을 통한 비즈니스 임팩트"
+  ],
+  "benefits": [],
+  "deadline": "",
+  "essay_questions": [],
+  "company_research": {
+    "mission_vision": "AI로 사람들의 삶을 혁신하는 것을 목표로 하고 있으며, AI 콘텐츠로 실제 성공을 경험하고 있습니다.",
+    "core_business": [
+      "AI 플랫폼 뤼튼, AI 캐릭터 서비스 크랙, 기업의 업무를 재정의하는 에이전트를 만드는 AX"
+    ],
+    "recent_news": [],
+    "tech_culture": "빠르게 시도하고, 실패에서 배우고, 잘 되는 것에 집중하는 문화",
+    "growth_direction": "생성형 AI로 인해 완전히 바뀔 또 한번의 산업 혁명을 대비하고 있습니다."
+  },
+  "_meta": {
+    "source_url": "https://www.wanted.co.kr/wd/324180",
+    "crawled_at": "2026-02-19T20:49:03.261861",
+    "site": "wanted"
+  }
+}
