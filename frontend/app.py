@@ -419,40 +419,6 @@ div[data-testid="stAlert"] {
   padding: var(--cf-space-3);
 }
 
-div[data-testid="stMetric"] {
-  border-radius: var(--cf-radius-md);
-  border: 1px solid var(--cf-border);
-  background: var(--cf-surface-2);
-  padding: 0.82rem 1rem;
-}
-
-div[data-testid="stMetricLabel"] p,
-div[data-testid="stMetricValue"] {
-  color: #ffffff !important;
-}
-
-button[data-baseweb="tab"] {
-  border-radius: 10px 10px 0 0 !important;
-  border: 1px solid var(--cf-border) !important;
-  border-bottom: none !important;
-  background: #1a2639 !important;
-  color: var(--cf-muted) !important;
-}
-
-button[data-baseweb="tab"][aria-selected="true"] {
-  background: var(--cf-accent-soft) !important;
-  color: #ffffff !important;
-  border-color: rgba(56, 189, 248, 0.6) !important;
-}
-
-div[data-testid="stTabs"] [data-baseweb="tab-panel"] {
-  border: 1px solid var(--cf-border);
-  border-radius: 0 12px 12px 12px;
-  background: var(--cf-surface-2);
-  color: #ffffff !important;
-  padding: 1rem;
-}
-
 div[data-testid="stDownloadButton"] > button {
   border-radius: 12px;
   border: 1px solid var(--cf-border) !important;
@@ -664,9 +630,19 @@ def _submit_pipeline(
         st.error("URL 추출이 실패했습니다. 공고 텍스트 또는 공고 캡처 이미지를 입력해 주세요.")
         return
 
-    with st.status("자소서 생성 파이프라인 실행 중", expanded=True) as status:
+    with st.status("파이프라인 실행 중", expanded=True) as status:
+        progress = st.progress(0)
+        current_task = st.empty()
+
+        def update_task(percent: int, title: str, detail: str = "") -> None:
+            progress.progress(max(0, min(100, percent)))
+            current_task.markdown(f"**{title}**" + (f"\n\n{detail}" if detail else ""))
+            status.write(f"{percent}% · {title}" + (f" - {detail}" if detail else ""))
+
         try:
-            status.write("1/3 이력서와 채용공고를 표준 스키마로 정리하고 있어요.")
+            update_task(10, "입력값 확인", "이력서 파일과 채용공고 URL을 검증합니다.")
+
+            update_task(30, "1단계: 이력서/공고 스키마 추출", "PDF와 공고를 분석해 표준 JSON으로 변환합니다.")
             pdf_path = persist_uploaded_pdf(uploaded_pdf, output_dir=Path("output"))
             user_profile, job_posting = run_schema_extraction(
                 pdf_path=str(pdf_path),
@@ -684,6 +660,7 @@ def _submit_pipeline(
                 st.session_state.user_profile = user_profile
                 st.session_state.need_job_fallback = True
                 st.session_state.pending_job_url = effective_job_url
+                update_task(45, "추가 입력 필요", "URL에서 요구사항 추출이 부족해 보완 정보가 필요합니다.")
                 status.update(label="추가 공고 정보가 필요합니다", state="error")
                 st.warning(
                     "채용공고 본문에서 요구사항 추출이 충분하지 않았습니다. "
@@ -693,9 +670,9 @@ def _submit_pipeline(
 
             meta = job_posting.get("_meta", {}) if isinstance(job_posting, dict) else {}
             if isinstance(meta, dict) and meta.get("manual_fallback_used"):
-                status.write("URL 추출 실패를 감지해 수동 입력 텍스트/이미지 fallback을 사용했습니다.")
+                status.write("URL 추출이 부족해 수동 입력 텍스트/이미지 fallback을 사용했습니다.")
 
-            status.write("2/3 기업 정보와 최신 이슈를 조사하고 있어요.")
+            update_task(65, "2단계: 기업 리서치", "회사/직무 관련 최신 정보와 맥락을 수집합니다.")
             research_result, company, team, role = run_company_research(
                 user_profile=user_profile,
                 job_posting=job_posting,
@@ -704,7 +681,7 @@ def _submit_pipeline(
                 output_dir=Path("output"),
             )
 
-            status.write("3/3 분석 결과를 반영해 완성형 자소서를 작성하고 있어요.")
+            update_task(85, "3단계: 자소서 생성", "리서치 결과를 반영해 문항별 완성본을 작성합니다.")
             essay_result = run_essay_writer(
                 user_profile=user_profile,
                 job_posting=job_posting,
@@ -726,6 +703,8 @@ def _submit_pipeline(
             st.session_state.need_job_fallback = False
             st.session_state.pending_job_url = ""
             st.session_state.fallback_job_text = ""
+
+            update_task(100, "완료", "생성 결과를 화면에 표시합니다.")
             status.update(label="완료", state="complete")
             st.success("맞춤 자소서 생성이 완료되었습니다.")
         except Exception as exc:
@@ -803,6 +782,23 @@ def _pick_section_text(essay_templates: dict[str, Any], label: str, index: int) 
     return ""
 
 
+def _normalize_reference_urls(raw_urls: Any) -> list[str]:
+    if not isinstance(raw_urls, list):
+        return []
+
+    cleaned: list[str] = []
+    seen: set[str] = set()
+    for item in raw_urls:
+        url = str(item or "").strip()
+        if not url or not url.startswith(("http://", "https://")):
+            continue
+        if url in seen:
+            continue
+        seen.add(url)
+        cleaned.append(url)
+    return cleaned
+
+
 def _render_results() -> None:
     if not st.session_state.pipeline_ready:
         return
@@ -812,26 +808,46 @@ def _render_results() -> None:
     if not isinstance(essay_templates, dict) or not essay_templates:
         return
 
-    company_info = st.session_state.company_info if isinstance(st.session_state.company_info, dict) else {}
-    name = str(company_info.get("name") or "").strip() or "-"
-    team = str(company_info.get("team") or "").strip() or "-"
-    role = str(company_info.get("role") or "").strip() or "-"
-
     st.markdown("<h3 class='cf-results-title'>생성 결과</h3>", unsafe_allow_html=True)
     st.markdown("<section class='cf-results-shell'>", unsafe_allow_html=True)
 
-    m1, m2, m3 = st.columns(3)
-    m1.metric("회사", name)
-    m2.metric("팀", team)
-    m3.metric("직무", role)
-
-    tabs = st.tabs(list(SECTION_LABELS))
     section_outputs: dict[str, str] = {}
     for idx, section in enumerate(SECTION_LABELS):
         text = _pick_section_text(essay_templates, section, idx)
         section_outputs[section] = text
-        with tabs[idx]:
-            st.write(text if text.strip() else f"{section} 결과를 찾지 못했습니다.")
+        st.markdown(f"### {section}")
+        st.write(text if text.strip() else f"{section} 결과를 찾지 못했습니다.")
+        if idx < len(SECTION_LABELS) - 1:
+            st.markdown("---")
+
+    research_result = st.session_state.research_result if isinstance(st.session_state.research_result, dict) else {}
+    reference_urls = _normalize_reference_urls(research_result.get("reference_urls", []))
+    diagnostics = research_result.get("diagnostics", {}) if isinstance(research_result, dict) else {}
+    warnings = diagnostics.get("warnings", []) if isinstance(diagnostics, dict) else []
+    errors = diagnostics.get("errors", []) if isinstance(diagnostics, dict) else []
+
+    if reference_urls:
+        st.markdown("### 근거 자료")
+        st.caption("아래 링크는 기업/직무 리서치에 실제로 사용된 출처입니다.")
+        max_links = 12
+        for idx, url in enumerate(reference_urls[:max_links], start=1):
+            st.markdown(f"{idx}. [{url}]({url})")
+        if len(reference_urls) > max_links:
+            st.caption(f"...외 {len(reference_urls) - max_links}개 출처가 추가로 사용되었습니다.")
+
+    if isinstance(warnings, list) and any(str(w).strip() for w in warnings):
+        st.markdown("### 리서치 경고")
+        for warning in warnings[:5]:
+            message = str(warning).strip()
+            if message:
+                st.warning(message)
+
+    if isinstance(errors, list) and any(str(e).strip() for e in errors):
+        st.markdown("### 리서치 오류")
+        for error in errors[:5]:
+            message = str(error).strip()
+            if message:
+                st.error(message)
 
     plain_text = "\n\n".join(f"[{section}]\n{section_outputs.get(section, '')}" for section in SECTION_LABELS)
     json_text = json.dumps(essay_result, ensure_ascii=False, indent=2)
@@ -860,7 +876,7 @@ def _render_form_page() -> None:
     st.markdown(
         """
 <section class="cf-card cf-form-header">
-  <a class="cf-back-link" href="?view=landing">← Home</a>
+  <a class="cf-back-link" href="?view=landing">← 홈으로</a>
   <h2>AI 맞춤 자소서 생성</h2>
   <p>이력서 분석 → 공고 추출 → 기업 리서치 → 자소서 생성 순으로 진행됩니다. 아래 자료를 제출해 주세요.</p>
 </section>

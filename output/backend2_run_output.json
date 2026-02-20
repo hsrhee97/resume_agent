@@ -1,24 +1,24 @@
 {
   "company_info": {
-    "name": "뉴앤디",
+    "name": "아토머스",
     "team": "지원 팀",
-    "role": "React Native 개발자"
+    "role": "AI/Agentic AI 서비스 기획자"
   },
-  "scale": "Medium",
+  "scale": "Large",
   "insights": {
-    "business_hook": "뉴앤디가 글로벌 K-Trend 직구 서비스 veasly를 통해 해외 시장에서 빠르게 성장하는 가운데, 사용자 중심적 디지털 제품 디자인 경험을 가진 저는 고객이 쉽고 빠르게 한국 브랜드를 경험할 수 있도록 혁신적인 사용자 경험 개선에 기여하고자 지원합니다.",
-    "tech_hook": "React Native 개발자 직무에서 요구하는 Expo 환경과 웹뷰-네이티브 간 연동 설계 경험은 부족하지만, JavaScript와 협업 도구(Figma, Adobe Creative Suite 등)를 활용한 UI/UX 설계 경험을 바탕으로 빠르게 기술 역량을 확장하며 사용자 친화적인 앱 개발에 기여할 준비가 되어 있습니다.",
-    "culture_hook": "뉴앤디가 빠르고 공격적인 글로벌 성장과 협업, 코드 품질 개선을 중시하는 문화 속에서, 저는 팀워크와 커뮤니케이션을 바탕으로 다양한 이해관계자와 협력하여 성공적인 결과물을 도출하는 협업 스타일로 회사의 책임감과 실행력, 고객 중심 가치를 실현하는 데 기여할 것입니다."
+    "business_hook": "아토머스가 멘탈헬스케어 서비스의 문턱을 낮추고 AI 기반 맞춤형 상담 솔루션을 통해 대중화를 추구하는 가운데, 저는 AI 에이전트 설계와 워크플로우 자동화 경험을 바탕으로 복잡한 비즈니스 요구사항을 명확히 분석하고, 사용자 중심의 서비스 기획으로 아토머스의 정신건강 서비스 혁신에 기여하고자 지원합니다.",
+    "tech_hook": "생성형 AI와 Agentic AI 기반 서비스 기획에 필수적인 프롬프트 설계, 정책 수립, 데이터 기반 의사결정 역량을 갖추었으며, LangChain, OpenAI API, 상태 관리 등 AI 에이전트 생태계 전반에 대한 실무 경험과 비용 최적화, 성능 개선 프로젝트 수행 경험을 통해 아토머스의 AI 서비스 품질 향상에 즉시 기여할 수 있습니다.",
+    "culture_hook": "빠른 실행과 적극적 소통, 냉철한 비판과 긍정적 실행을 중시하는 아토머스의 조직 문화에 맞춰, 저는 동료와 지식을 공유하며 협업하는 것을 중요시하고, 복잡한 요구사항을 명확히 구조화하여 개발·디자인·운영팀과 원활히 협력해 제품을 성공적으로 런칭하고 개선한 경험을 바탕으로 신뢰와 약속을 지키는 팀원이 되겠습니다."
   },
   "llm_invoke": {
     "invoked": true,
-    "raw_response": "{\n  \"business_hook\": \"뉴앤디가 글로벌 K-Trend 직구 서비스 veasly를 통해 해외 시장에서 빠르게 성장하는 가운데, 사용자 중심적 디지털 제품 디자인 경험을 가진 저는 고객이 쉽고 빠르게 한국 브랜드를 경험할 수 있도록 혁신적인 사용자 경험 개선에 기여하고자 지원합니다.\",\n  \"tech_hook\": \"React Native 개발자 직무에서 요구하는 Expo 환경과 웹뷰-네이티브 간 연동 설계 경험은 부족하지만, JavaScript와 협업 도구(Figma, Adobe Creative Suite 등)를 활용한 UI/UX 설계 경험을 바탕으로 빠르게 기술 역량을 확장하며 사용자 친화적인 앱 개발에 기여할 준비가 되어 있습니다.\",\n  \"culture_hook\": \"뉴앤디가 빠르고 공격적인 글로벌 성장과 협업, 코드 품질 개선을 중시하는 문화 속에서, 저는 팀워크와 커뮤니케이션을 바탕으로 다양한 이해관계자와 협력하여 성공적인 결과물을 도출하는 협업 스타일로 회사의 책임감과 실행력, 고객 중심 가치를 실현하는 데 기여할 것입니다.\"\n}",
+    "raw_response": "{\n  \"business_hook\": \"아토머스가 멘탈헬스케어 서비스의 문턱을 낮추고 AI 기반 맞춤형 상담 솔루션을 통해 대중화를 추구하는 가운데, 저는 AI 에이전트 설계와 워크플로우 자동화 경험을 바탕으로 복잡한 비즈니스 요구사항을 명확히 분석하고, 사용자 중심의 서비스 기획으로 아토머스의 정신건강 서비스 혁신에 기여하고자 지원합니다.\",\n  \"tech_hook\": \"생성형 AI와 Agentic AI 기반 서비스 기획에 필수적인 프롬프트 설계, 정책 수립, 데이터 기반 의사결정 역량을 갖추었으며, LangChain, OpenAI API, 상태 관리 등 AI 에이전트 생태계 전반에 대한 실무 경험과 비용 최적화, 성능 개선 프로젝트 수행 경험을 통해 아토머스의 AI 서비스 품질 향상에 즉시 기여할 수 있습니다.\",\n  \"culture_hook\": \"빠른 실행과 적극적 소통, 냉철한 비판과 긍정적 실행을 중시하는 아토머스의 조직 문화에 맞춰, 저는 동료와 지식을 공유하며 협업하는 것을 중요시하고, 복잡한 요구사항을 명확히 구조화하여 개발·디자인·운영팀과 원활히 협력해 제품을 성공적으로 런칭하고 개선한 경험을 바탕으로 신뢰와 약속을 지키는 팀원이 되겠습니다.\"\n}",
     "parse_success": true,
     "used_fallback": false,
     "parsed_json": {
-      "business_hook": "뉴앤디가 글로벌 K-Trend 직구 서비스 veasly를 통해 해외 시장에서 빠르게 성장하는 가운데, 사용자 중심적 디지털 제품 디자인 경험을 가진 저는 고객이 쉽고 빠르게 한국 브랜드를 경험할 수 있도록 혁신적인 사용자 경험 개선에 기여하고자 지원합니다.",
-      "tech_hook": "React Native 개발자 직무에서 요구하는 Expo 환경과 웹뷰-네이티브 간 연동 설계 경험은 부족하지만, JavaScript와 협업 도구(Figma, Adobe Creative Suite 등)를 활용한 UI/UX 설계 경험을 바탕으로 빠르게 기술 역량을 확장하며 사용자 친화적인 앱 개발에 기여할 준비가 되어 있습니다.",
-      "culture_hook": "뉴앤디가 빠르고 공격적인 글로벌 성장과 협업, 코드 품질 개선을 중시하는 문화 속에서, 저는 팀워크와 커뮤니케이션을 바탕으로 다양한 이해관계자와 협력하여 성공적인 결과물을 도출하는 협업 스타일로 회사의 책임감과 실행력, 고객 중심 가치를 실현하는 데 기여할 것입니다."
+      "business_hook": "아토머스가 멘탈헬스케어 서비스의 문턱을 낮추고 AI 기반 맞춤형 상담 솔루션을 통해 대중화를 추구하는 가운데, 저는 AI 에이전트 설계와 워크플로우 자동화 경험을 바탕으로 복잡한 비즈니스 요구사항을 명확히 분석하고, 사용자 중심의 서비스 기획으로 아토머스의 정신건강 서비스 혁신에 기여하고자 지원합니다.",
+      "tech_hook": "생성형 AI와 Agentic AI 기반 서비스 기획에 필수적인 프롬프트 설계, 정책 수립, 데이터 기반 의사결정 역량을 갖추었으며, LangChain, OpenAI API, 상태 관리 등 AI 에이전트 생태계 전반에 대한 실무 경험과 비용 최적화, 성능 개선 프로젝트 수행 경험을 통해 아토머스의 AI 서비스 품질 향상에 즉시 기여할 수 있습니다.",
+      "culture_hook": "빠른 실행과 적극적 소통, 냉철한 비판과 긍정적 실행을 중시하는 아토머스의 조직 문화에 맞춰, 저는 동료와 지식을 공유하며 협업하는 것을 중요시하고, 복잡한 요구사항을 명확히 구조화하여 개발·디자인·운영팀과 원활히 협력해 제품을 성공적으로 런칭하고 개선한 경험을 바탕으로 신뢰와 약속을 지키는 팀원이 되겠습니다."
     }
   },
   "diagnostics": {
@@ -31,27 +31,28 @@
     "user_profile_attached": true
   },
   "reference_urls": [
-    "https://blog.adebayo.dev/posts/building-a-universal-react-app-with-expo-nextjs-nativewind",
-    "https://blog.ninehire.com/corporate-innovation",
-    "https://cms.handong.edu/dcp/editor/files/2024_12%20%ED%95%9C%EB%8F%99%EB%8C%80%20%EC%A7%84%EB%A1%9C%EA%B0%80%EC%9D%B4%EB%93%9C%EB%B6%81_%EB%82%B1%EC%9E%A5_compressed.pdf",
-    "https://expo.dev/blog/from-a-brownfield-react-native-and-next-js-stack-to-one-expo-app",
-    "https://expo.dev/blog/from-web-to-native-with-react",
-    "https://github.com/devpools/devpools.github.io/blob/master/content.json",
-    "https://hotssul.com/bbs/board.php?bo_table=ssul19&wr_id=560459",
-    "https://huggingface.co/deliciouscat/kf-deberta-base-cross-nli/commit/9415c42742d3030adb1b3653c4c17c815f00b064.diff?file=vocab.txt",
-    "https://kr.linkedin.com/company/newndy",
-    "https://m.blog.naver.com/PostView.naver?blogId=mynameisdj&logNo=223678363999",
-    "https://research1039.rssing.com/chan-19369390/all_p6.html",
-    "https://s-space.snu.ac.kr/bitstream/10371/29932/3/management_information_v17_01_p59.pdf",
-    "https://thevc.kr/newndy",
-    "https://tkor097.com/웹툰/금",
-    "https://vcletter.co.kr/fileupload/pdf/2021_KVIC-24-KR.pdf",
-    "https://www.firstmancamp.com/image/kosme_scop/Leadership%20for%20Strategic%20Execution%20Excellence.pdf",
-    "https://www.hanmiglobal.com/kr/data/brochure.pdf",
-    "https://www.hanwhavision.com/wp-content/uploads/2025/04/%ED%95%9C%ED%99%94%EB%B9%84%EC%A0%84%EC%82%AC%EC%97%85%EB%B3%B4%EA%B3%A0%EC%84%9C2025.03.17.pdf",
-    "https://www.inha.ac.kr/bbs/kr/8/38558/download.do",
-    "https://www.ls-electric.com/ko/company/data/2021_year.pdf",
-    "https://www.stechstar.com/user/wordpress/category/%ED%95%99%EC%8A%B5%EC%9E%90%EB%A3%8C/",
-    "https://www.wanted.co.kr/wd/294759"
+    "https://atommerce.ninehire.site/",
+    "https://atommerce.ninehire.site/job_posting/83vKxq6f",
+    "https://atommerce.ninehire.site/job_posting/oYc1784G",
+    "https://atommerce.ninehire.site/ugax3akz",
+    "https://brunch.co.kr/@venturedigest/44",
+    "https://center.mindcafe.co.kr/faq",
+    "https://eng.snu.ac.kr/sites/default/files/%EA%B3%B5%EB%8C%80%EC%83%81%EC%83%8121%ED%98%B8-%EC%84%9C%EC%9A%B8%EB%8C%80%EA%B3%B5%EB%8C%80%20%EC%9D%B4%EC%95%BC%EA%B8%B0-2017-9.pdf",
+    "https://flex.team/blog/2024/07/09/mindcafe/",
+    "https://ipus.snu.ac.kr/wp-content/uploads/2025/05/1.-2024-%ED%86%B5%EC%9D%BC%ED%8F%89%ED%99%94%EA%B8%B0%EB%B0%98%EA%B5%AC%EC%B6%95%EC%82%AC%EC%97%85-%EA%B2%B0%EA%B3%BC%EB%B3%B4%EA%B3%A0%EC%84%9C_%ED%95%9C%EC%A0%95%ED%9B%88.pdf",
+    "https://smallake.kr/wp-content/uploads/2023/04/%EB%8B%B9%EC%8B%A0%EC%9D%98-%EB%AF%B8%EB%9E%98%EB%A5%BC-%EB%B0%94%EA%BF%80-%EC%83%9D%EC%84%B1-AI-%EC%8A%A4%ED%83%80%ED%8A%B8%EC%97%85.pdf",
+    "https://wowtale.net/2025/11/28/251146/",
+    "https://www.auxiliobits.com/blog/the-tech-stack-behind-agentic-ai-in-the-enterprise-frameworks-apis-and-ecosystems/",
+    "https://www.dasan.group/ceo_column_category/%EA%B9%80%EC%84%A0%EC%8B%9D-%EB%8C%80%ED%91%9C%EC%9D%98-%ED%8C%80%EC%9E%A5%EC%9D%98-%EB%AF%B8%EB%9E%98/",
+    "https://www.innoforest.co.kr/company/CP00001826/%EC%95%84%ED%86%A0%EB%A8%B8%EC%8A%A4",
+    "https://www.jobplanet.co.kr/companies/330611/landing/%EC%95%84%ED%86%A0%EB%A8%B8%EC%8A%A4",
+    "https://www.jobplanet.co.kr/job/search?posting_ids%5B%5D=1304084",
+    "https://www.kmediarods.com/fileUpload/bulletins/bulletin_2025-01-06.pdf",
+    "https://www.lgcns.com/kr/service/ai/agentic-ai",
+    "https://www.navercorp.com/navercorp_/ir/auditReport/2021/2Q21_consolidated_kor.pdf",
+    "https://www.samsungsds.com/kr/insights/agentic-ai-the-autonomous-era-of-artificial-intelligence.html",
+    "https://www.teradata.com/insights/ai-and-machine-learning/agentic-ai-stack-with-teradata-agentbuilder",
+    "https://www.uber.com/kr/ko/ai-solutions/the-agentic-ai-tech-stack/",
+    "https://www.zirous.com/2025/10/30/the-hidden-power-of-agentic-ai-inside-your-tech-stack/"
   ]
 }
