@@ -18,19 +18,14 @@ import os
 import sys
 from datetime import datetime
 
-from dotenv import load_dotenv
-
 # 현재 파일 위치 기준으로 preprocess_agent_app 모듈 경로를 sys.path에 추가
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 APP_DIR = os.path.join(BASE_DIR, "preprocess_agent_app")
 if APP_DIR not in sys.path:
-    sys.path.append(APP_DIR)
-
-# Load API keys and runtime options from .env if present.
-load_dotenv()
+    sys.path.insert(0, APP_DIR)
 
 from config import PROMPTS, USER_PROFILE_SCHEMA, JOB_POSTING_SCHEMA
-from llm_client import HuggingFaceLLM, OllamaLLM, OpenAILLM
+from llm_client import OpenAILLM, HuggingFaceLLM, OllamaLLM
 from pdf_parser import extract_text_from_pdf, chunk_text
 from web_crawler import JobPostingCrawler, CompanyResearcher, format_research_for_llm
 
@@ -48,33 +43,29 @@ class FirstAgent:
 
     def __init__(
         self,
-        llm_backend: str = "openai",
+        llm_backend: str = "huggingface",
         hf_token: str = None,
         model_name: str = "",
         temperature: float = 0.3,
     ):
         """
         Args:
-            llm_backend: "openai" 또는 "huggingface" 또는 "ollama"
+            llm_backend: "openai", "huggingface", 또는 "ollama"
             hf_token: HuggingFace API 토큰 (huggingface 백엔드 사용 시)
-            model_name: 백엔드별 모델명 (openai: gpt-4.1-mini, ollama: qwen2.5 등)
-            temperature: 생성 temperature (openai 백엔드에 주로 적용)
+            model_name: 모델명 (백엔드별로 다름)
+            temperature: 생성 온도 (0.0 ~ 1.0)
         """
-        backend = (llm_backend or "openai").strip().lower()
-        selected_model = (model_name or "").strip()
-
-        if backend == "openai":
-            openai_model = selected_model or os.getenv("OPENAI_MODEL", "gpt-4.1-mini")
-            self.llm = OpenAILLM(model=openai_model, temperature=temperature)
-            print(f"[LLM] OpenAI ({openai_model})")
-        elif backend == "ollama":
-            ollama_model = selected_model or os.getenv("OLLAMA_MODEL", "qwen2.5")
-            self.llm = OllamaLLM(model=ollama_model)
-            print(f"[LLM] Ollama ({ollama_model})")
-        else:
-            hf_model = selected_model or os.getenv("HF_MODEL", "")
-            self.llm = HuggingFaceLLM(api_token=hf_token, model_id=hf_model or None)
-            print(f"[LLM] HuggingFace ({self.llm.model_id})")
+        if llm_backend == "openai":
+            model = model_name.strip() if model_name.strip() else "gpt-4.1-mini"
+            self.llm = OpenAILLM(model=model, temperature=temperature)
+            print(f"🤖 LLM 백엔드: OpenAI ({model})")
+        elif llm_backend == "ollama":
+            model = model_name.strip() if model_name.strip() else "mistral"
+            self.llm = OllamaLLM(model=model)
+            print(f"🤖 LLM 백엔드: Ollama (로컬, {model})")
+        else:  # huggingface
+            self.llm = HuggingFaceLLM(api_token=hf_token, model_id=model_name.strip() if model_name.strip() else None)
+            print(f"🤖 LLM 백엔드: HuggingFace ({self.llm.model_id})")
 
         self.job_crawler = JobPostingCrawler()
         self.researcher = CompanyResearcher()
@@ -223,91 +214,6 @@ class FirstAgent:
         return base
 
     # ============================================================
-    # Task B-0: 텍스트 → 채용공고 JSON
-    # ============================================================
-    def extract_job_posting_from_text(
-        self,
-        raw_text: str,
-        source_url: str = "",
-        site: str = "manual",
-        company_hint: str = "",
-        title_hint: str = "",
-    ) -> dict:
-        """
-        수집/입력된 채용공고 텍스트를 JOB_POSTING_SCHEMA에 맞게 구조화
-        (URL 크롤링 실패 시 수동 텍스트/이미지 OCR fallback에서도 사용)
-        """
-        normalized_text = str(raw_text or "").strip()
-        if not normalized_text:
-            return {"url": source_url, "error": "공고 텍스트 없음"}
-
-        print("\n[STEP] LLM으로 공고 정보 구조화 중...")
-        schema_str = json.dumps(JOB_POSTING_SCHEMA, ensure_ascii=False, indent=2)
-        prompt = PROMPTS["extract_job_posting"].format(
-            schema=schema_str, text=normalized_text
-        )
-        job_info = self.llm.generate_json(prompt)
-
-        if not isinstance(job_info, dict) or not job_info:
-            print("  [WARN] LLM 파싱 실패. 입력 텍스트 기반 기본 구조 사용")
-            job_info = {
-                "company": {"name": company_hint or ""},
-                "position": {"title": title_hint or ""},
-                "raw_sections": [{"header": "raw_text", "content": normalized_text[:5000]}],
-            }
-
-        company_block = job_info.setdefault("company", {})
-        if not isinstance(company_block, dict):
-            company_block = {}
-            job_info["company"] = company_block
-        if company_hint and not str(company_block.get("name") or "").strip():
-            company_block["name"] = company_hint
-
-        position_block = job_info.setdefault("position", {})
-        if not isinstance(position_block, dict):
-            position_block = {}
-            job_info["position"] = position_block
-        if title_hint and not str(position_block.get("title") or "").strip():
-            position_block["title"] = title_hint
-
-        # Step 3: 회사 리서치 (추가 정보 수집)
-        company_name = str(company_block.get("name") or "").strip()
-        position = str(position_block.get("title") or "").strip()
-        if company_name:
-            print(f"\n[STEP] 회사 리서치 수행 중... ({company_name})")
-            research = self.researcher.research(company_name, position)
-
-            # Step 4: 리서치 결과를 LLM으로 정리
-            print("\n[STEP] 리서치 결과 정리 중...")
-            research_text = format_research_for_llm(research)
-
-            if research_text != "검색 결과 없음":
-                research_prompt = PROMPTS["research_company"].format(
-                    company_name=company_name,
-                    position=position,
-                    search_results=research_text[:3000],
-                )
-                research_json = self.llm.generate_json(research_prompt)
-
-                if isinstance(research_json, dict) and research_json:
-                    job_info.setdefault("company_research", {}).update(research_json)
-                else:
-                    job_info["company_research"] = {"raw_data": research_text[:2000]}
-        else:
-            print("  [WARN] 회사명 추출 실패. 리서치 건너뜀.")
-
-        # 메타데이터 추가
-        meta = {
-            "source_url": source_url,
-            "crawled_at": datetime.now().isoformat(),
-            "site": site or "manual",
-        }
-        if str(site or "").startswith("manual"):
-            meta["manual_fallback_used"] = True
-        job_info["_meta"] = meta
-        return job_info
-
-    # ============================================================
     # Task B: URL → 채용공고 + 회사 리서치 JSON
     # ============================================================
     def extract_job_posting(self, url: str) -> dict:
@@ -328,27 +234,75 @@ class FirstAgent:
         print(f"\n1️⃣ 채용공고 크롤링 중...")
         crawl_result = self.job_crawler.crawl(url)
 
-        raw_text = str(crawl_result.get("raw_text") or "").strip()
-        if not raw_text:
+        if not crawl_result.get("raw_text"):
             print("  ❌ 채용공고 텍스트를 가져올 수 없습니다.")
             return {"url": url, "error": "크롤링 실패"}
 
-        parsed = crawl_result.get("parsed")
-        parsed_dict = parsed if isinstance(parsed, dict) else {}
-        return self.extract_job_posting_from_text(
-            raw_text=raw_text,
-            source_url=url,
-            site=str(crawl_result.get("site") or ""),
-            company_hint=str(parsed_dict.get("company") or "").strip(),
-            title_hint=str(parsed_dict.get("title") or "").strip(),
+        # Step 2: LLM으로 공고 정보 구조화
+        print(f"\n2️⃣ LLM으로 공고 정보 구조화 중...")
+        schema_str = json.dumps(JOB_POSTING_SCHEMA, ensure_ascii=False, indent=2)
+        prompt = PROMPTS["extract_job_posting"].format(
+            schema=schema_str, text=crawl_result["raw_text"]
+        )
+        job_info = self.llm.generate_json(prompt)
+
+        if not job_info:
+            print("  ⚠️ LLM 파싱 실패. 크롤링 원본 데이터 사용")
+            job_info = {
+                "company": {"name": crawl_result["parsed"].get("company", "")},
+                "position": {"title": crawl_result["parsed"].get("title", "")},
+                "raw_sections": crawl_result["parsed"].get("sections", []),
+            }
+
+        # Step 3: 회사 리서치 (추가 정보 수집)
+        company_name = (
+            job_info.get("company", {}).get("name", "")
+            or crawl_result["parsed"].get("company", "")
+        )
+        position = (
+            job_info.get("position", {}).get("title", "")
+            or crawl_result["parsed"].get("title", "")
         )
 
+        if company_name:
+            print(f"\n3️⃣ 회사 리서치 수행 중... ({company_name})")
+            research = self.researcher.research(company_name, position)
+
+            # Step 4: 리서치 결과를 LLM으로 정리
+            print(f"\n4️⃣ 리서치 결과 정리 중...")
+            research_text = format_research_for_llm(research)
+
+            if research_text != "검색 결과 없음":
+                research_prompt = PROMPTS["research_company"].format(
+                    company_name=company_name,
+                    position=position,
+                    search_results=research_text[:3000],
+                )
+                research_json = self.llm.generate_json(research_prompt)
+
+                if research_json:
+                    job_info.setdefault("company_research", {}).update(research_json)
+                else:
+                    job_info["company_research"] = {"raw_data": research_text[:2000]}
+        else:
+            print("  ⚠️ 회사명 추출 실패. 리서치 건너뜀.")
+
+        # 메타데이터 추가
+        job_info["_meta"] = {
+            "source_url": url,
+            "crawled_at": datetime.now().isoformat(),
+            "site": crawl_result["site"],
+        }
+
+        return job_info
+
     # ============================================================
-    # 통합 실행
+    # 통합 실행 (Task A/B 병렬 처리)
     # ============================================================
     def run(self, pdf_path: str = None, url: str = None, output_dir: str = "./output") -> dict:
         """
         에이전트 실행 (PDF, URL 중 하나 또는 둘 다)
+        둘 다 있으면 Task A(PDF)와 Task B(크롤링+리서치)를 병렬 실행.
 
         Args:
             pdf_path: 샘플 자소서 PDF 경로
@@ -358,33 +312,361 @@ class FirstAgent:
         Returns:
             { "profile": {...}, "job_posting": {...} }
         """
+        from concurrent.futures import ThreadPoolExecutor, as_completed
+        import threading
+
         os.makedirs(output_dir, exist_ok=True)
         results = {}
 
-        # Task A: PDF 프로필 추출
-        if pdf_path:
-            profile = self.extract_profile_from_pdf(pdf_path)
-            results["profile"] = profile
+        # 둘 다 있으면 병렬, 아니면 순차
+        if pdf_path and url:
+            print("\n⚡ Task A(PDF) + Task B(URL) 병렬 실행")
+            print("=" * 60)
 
-            output_path = os.path.join(output_dir, "user_profile.json")
-            with open(output_path, "w", encoding="utf-8") as f:
-                json.dump(profile, f, ensure_ascii=False, indent=2)
-            print(f"\n💾 프로필 저장: {output_path}")
+            # Task B는 2단계로 분리:
+            #   B-1) 크롤링 (병렬) → B-2) 직무 선택 + LLM (메인 스레드)
+            # Task A는 전체를 백그라운드에서 실행
 
-        # Task B: 채용공고 + 리서치
-        if url:
-            job_posting = self.extract_job_posting(url)
-            results["job_posting"] = job_posting
+            profile_result = {}
+            crawl_result_holder = {}
+            errors = {}
 
-            output_path = os.path.join(output_dir, "job_posting.json")
-            with open(output_path, "w", encoding="utf-8") as f:
-                json.dump(job_posting, f, ensure_ascii=False, indent=2)
-            print(f"\n💾 채용공고 저장: {output_path}")
+            def _run_task_a():
+                try:
+                    profile_result["data"] = self.extract_profile_from_pdf(pdf_path)
+                except Exception as e:
+                    errors["task_a"] = str(e)
+
+            def _run_task_b_crawl():
+                try:
+                    crawl_result_holder["data"] = self._crawl_only(url)
+                except Exception as e:
+                    errors["task_b_crawl"] = str(e)
+
+            # 병렬 실행: Task A 전체 + Task B 크롤링
+            with ThreadPoolExecutor(max_workers=2, thread_name_prefix="agent") as pool:
+                fut_a = pool.submit(_run_task_a)
+                fut_b = pool.submit(_run_task_b_crawl)
+
+                # 둘 다 완료 대기
+                for fut in as_completed([fut_a, fut_b]):
+                    if fut.exception():
+                        print(f"  ⚠️ 스레드 에러: {fut.exception()}")
+
+            # Task A 결과 저장
+            if "data" in profile_result:
+                results["profile"] = profile_result["data"]
+                output_path = os.path.join(output_dir, "user_profile.json")
+                with open(output_path, "w", encoding="utf-8") as f:
+                    json.dump(results["profile"], f, ensure_ascii=False, indent=2)
+                print(f"\n💾 프로필 저장: {output_path}")
+
+            # Task B: 크롤링 완료 → 직무 선택 + LLM (메인 스레드)
+            if "data" in crawl_result_holder:
+                crawl_result = crawl_result_holder["data"]
+                job_posting = self._process_crawl_result(url, crawl_result)
+                results["job_posting"] = job_posting
+
+                output_path = os.path.join(output_dir, "job_posting.json")
+                with open(output_path, "w", encoding="utf-8") as f:
+                    json.dump(job_posting, f, ensure_ascii=False, indent=2)
+                print(f"\n💾 채용공고 저장: {output_path}")
+
+            if errors:
+                print(f"\n  ⚠️ 에러 발생: {errors}")
+
+        else:
+            # 하나만 있으면 순차 실행
+            if pdf_path:
+                profile = self.extract_profile_from_pdf(pdf_path)
+                results["profile"] = profile
+                output_path = os.path.join(output_dir, "user_profile.json")
+                with open(output_path, "w", encoding="utf-8") as f:
+                    json.dump(profile, f, ensure_ascii=False, indent=2)
+                print(f"\n💾 프로필 저장: {output_path}")
+
+            if url:
+                job_posting = self.extract_job_posting(url)
+                results["job_posting"] = job_posting
+                output_path = os.path.join(output_dir, "job_posting.json")
+                with open(output_path, "w", encoding="utf-8") as f:
+                    json.dump(job_posting, f, ensure_ascii=False, indent=2)
+                print(f"\n💾 채용공고 저장: {output_path}")
 
         # 요약 출력
         self._print_summary(results)
 
         return results
+
+    # ============================================================
+    # Task B 분리 헬퍼 (병렬 실행용)
+    # ============================================================
+    def _crawl_only(self, url: str) -> dict:
+        """Task B의 크롤링 단계만 수행 (병렬 실행 가능)"""
+        print("\n" + "=" * 60)
+        print("🔗 [Task B-1] 채용공고 크롤링 (병렬)")
+        print("=" * 60)
+
+        print(f"\n1️⃣ 채용공고 크롤링 중...")
+        crawl_result = self.job_crawler.crawl(url)
+
+        if not crawl_result.get("raw_text"):
+            print("  ❌ 채용공고 텍스트를 가져올 수 없습니다.")
+            return {"error": "크롤링 실패", "site": "unknown"}
+
+        return crawl_result
+
+    def _process_crawl_result(self, url: str, crawl_result: dict,
+                               selected_position: int = None) -> dict:
+        """크롤링 결과로 직무 선택 + LLM 구조화 + 리서치 수행 (메인 스레드)"""
+        if crawl_result.get("error"):
+            return {"url": url, "error": crawl_result["error"]}
+
+        print("\n" + "=" * 60)
+        print("🔗 [Task B-2] 직무 선택 + 구조화 + 리서치")
+        print("=" * 60)
+
+        # 다중 직무 감지 → 직무 선택
+        positions = self._detect_multiple_positions(crawl_result)
+        selected_raw_text = crawl_result["raw_text"]
+
+        if positions and len(positions) > 1:
+            print(f"\n📋 {len(positions)}개 직무가 감지되었습니다:")
+            print("-" * 50)
+            for i, pos in enumerate(positions, 1):
+                title = pos["title"].replace("\n", " ")
+                category = pos.get("category", "")
+                print(f"  [{i}] {title}{f' ({category})' if category else ''}")
+            print("-" * 50)
+
+            if selected_position is not None:
+                choice = selected_position
+            else:
+                while True:
+                    try:
+                        choice = int(input("\n👉 지원할 직무 번호를 선택하세요: "))
+                        if 1 <= choice <= len(positions):
+                            break
+                        print(f"  ⚠️ 1~{len(positions)} 사이의 번호를 입력하세요.")
+                    except ValueError:
+                        print("  ⚠️ 숫자를 입력하세요.")
+                    except (EOFError, KeyboardInterrupt):
+                        print("\n  ⚠️ 첫 번째 직무를 선택합니다.")
+                        choice = 1
+                        break
+
+            selected = positions[choice - 1]
+            print(f"\n  ✅ 선택된 직무: {selected['title'].replace(chr(10), ' ')}")
+            selected_raw_text = self._build_selected_position_text(crawl_result, selected)
+
+        # LLM으로 공고 정보 구조화
+        print(f"\n2️⃣ LLM으로 공고 정보 구조화 중...")
+        schema_str = json.dumps(JOB_POSTING_SCHEMA, ensure_ascii=False, indent=2)
+        prompt = PROMPTS["extract_job_posting"].format(
+            schema=schema_str, text=selected_raw_text[:6000]
+        )
+        job_info = self.llm.generate_json(prompt)
+
+        if not job_info:
+            print("  ⚠️ LLM 파싱 실패. 크롤링 원본 데이터 사용")
+            job_info = {
+                "company": {"name": crawl_result["parsed"].get("company", "")},
+                "position": {"title": crawl_result["parsed"].get("title", "")},
+                "raw_sections": crawl_result["parsed"].get("sections", []),
+            }
+
+        # 회사 리서치
+        company_name = (
+            job_info.get("company", {}).get("name", "")
+            or crawl_result["parsed"].get("company", "")
+        )
+        position = (
+            job_info.get("position", {}).get("title", "")
+            or crawl_result["parsed"].get("title", "")
+        )
+
+        if company_name:
+            print(f"\n3️⃣ 회사 리서치 수행 중... ({company_name})")
+            research = self.researcher.research(company_name, position)
+
+            print(f"\n4️⃣ 리서치 결과 정리 중...")
+            research_text = format_research_for_llm(research)
+
+            if research_text != "검색 결과 없음":
+                research_prompt = PROMPTS["research_company"].format(
+                    company_name=company_name,
+                    position=position,
+                    search_results=research_text[:3000],
+                )
+                research_json = self.llm.generate_json(research_prompt)
+                if research_json:
+                    job_info.setdefault("company_research", {}).update(research_json)
+                else:
+                    job_info["company_research"] = {"raw_data": research_text[:2000]}
+        else:
+            print("  ⚠️ 회사명 추출 실패. 리서치 건너뜀.")
+
+        job_info["_meta"] = {
+            "source_url": url,
+            "crawled_at": datetime.now().isoformat(),
+            "site": crawl_result["site"],
+        }
+
+        return job_info
+
+    # ============================================================
+    # 다중 직무 감지/선택 헬퍼
+    # ============================================================
+    def _detect_multiple_positions(self, crawl_result: dict) -> list:
+        """크롤링 결과에서 여러 직무를 감지하여 리스트로 반환"""
+        sections = crawl_result.get("parsed", {}).get("sections", [])
+
+        # 직무별 section: header에 지원자격/우대사항이 포함된 것들
+        positions = []
+        base_headers = {"경력", "학력", "고용형태", "급여", "근무지", "스킬", "우대사항"}
+
+        for sec in sections:
+            header = sec["header"]
+            content = sec["content"]
+
+            # 기본 요약정보는 건너뜀
+            if header in base_headers:
+                continue
+            # 기업정보 키도 건너뜀
+            if header in ("industry", "employees", "founded", "company_type",
+                          "revenue", "homepage"):
+                continue
+
+            # content에 [지원자격] 또는 [우대사항]이 있으면 직무 section
+            if "[지원자격]" in content or "[우대사항]" in content:
+                # 구분/인원 등 추출
+                category = ""
+                if "<" in header and ">" in header:
+                    # <평가모형컨설팅> 같은 카테고리 추출
+                    import re
+                    cat_match = re.search(r"<(.+?)>", header)
+                    if cat_match:
+                        category = cat_match.group(1)
+
+                # 중복 방지 (같은 title이 이미 있으면 스킵)
+                title_clean = header.replace("\n", " ").strip()
+                if not any(p["title"].replace("\n", " ").strip() == title_clean
+                           for p in positions):
+                    positions.append({
+                        "title": header,
+                        "content": content,
+                        "category": category,
+                    })
+
+        return positions
+
+    def _build_selected_position_text(self, crawl_result: dict, selected: dict) -> str:
+        """선택된 직무 정보 + 공통 정보를 합쳐서 LLM 입력용 텍스트 생성"""
+        sections = crawl_result.get("parsed", {}).get("sections", [])
+        base_headers = {"경력", "학력", "고용형태", "급여", "근무지", "스킬", "우대사항"}
+
+        lines = []
+
+        # 공통 정보 (회사명, 공고제목 등)
+        company = crawl_result.get("parsed", {}).get("company", "")
+        title = crawl_result.get("parsed", {}).get("title", "")
+        if company:
+            lines.append(f"회사명: {company}")
+        if title:
+            lines.append(f"공고제목: {title}")
+        lines.append("")
+
+        # 기본 요약정보
+        lines.append("=== 기본 정보 ===")
+        for sec in sections:
+            if sec["header"] in base_headers:
+                lines.append(f"{sec['header']}: {sec['content']}")
+        lines.append("")
+
+        # 선택된 직무 정보
+        lines.append("=== 지원 직무 상세 ===")
+        pos_title = selected["title"].replace("\n", " ")
+        lines.append(f"직무명: {pos_title}")
+        if selected.get("category"):
+            lines.append(f"소속: {selected['category']}")
+        lines.append(f"\n{selected['content']}")
+
+        return "\n".join(lines)
+
+    def extract_job_posting_from_text(
+        self, raw_text: str, source_url: str = "", site: str = "manual_fallback"
+    ) -> dict:
+        """
+        채용공고 텍스트에서 공고 정보를 JSON으로 추출 (URL 크롤링 없이)
+
+        Args:
+            raw_text: 채용공고 텍스트
+            source_url: 원본 URL (메타데이터용)
+            site: 사이트 식별자
+
+        Returns:
+            JOB_POSTING_SCHEMA에 맞는 딕셔너리
+        """
+        print("\n" + "=" * 60)
+        print("🔗 [Task B] 채용공고 텍스트 → 공고 JSON 추출")
+        print("=" * 60)
+
+        if not raw_text or not raw_text.strip():
+            print("  ❌ 텍스트가 비어있습니다.")
+            return {"error": "텍스트 없음", "url": source_url}
+
+        # Step 1: LLM으로 공고 정보 구조화
+        print(f"\n[STEP] LLM으로 공고 정보 구조화 중...")
+        schema_str = json.dumps(JOB_POSTING_SCHEMA, ensure_ascii=False, indent=2)
+        prompt = PROMPTS["extract_job_posting"].format(
+            schema=schema_str, text=raw_text[:6000]
+        )
+        job_info = self.llm.generate_json(prompt)
+
+        if not job_info:
+            print("  ⚠️ LLM 파싱 실패. 기본 구조 생성")
+            job_info = {
+                "company": {"name": ""},
+                "position": {"title": ""},
+                "raw_text": raw_text[:2000],
+            }
+
+        # Step 2: 회사 리서치 (회사명이 있으면)
+        company_name = job_info.get("company", {}).get("name", "")
+        position = job_info.get("position", {}).get("title", "")
+
+        if company_name:
+            print(f"\n[STEP] 회사 리서치 수행 중... ({company_name})")
+            research = self.researcher.research(company_name, position)
+
+            # Step 3: 리서치 결과를 LLM으로 정리
+            print(f"\n[STEP] 리서치 결과 정리 중...")
+            research_text = format_research_for_llm(research)
+
+            if research_text != "검색 결과 없음":
+                research_prompt = PROMPTS["research_company"].format(
+                    company_name=company_name,
+                    position=position,
+                    search_results=research_text[:3000],
+                )
+                research_json = self.llm.generate_json(research_prompt)
+
+                if research_json:
+                    job_info.setdefault("company_research", {}).update(research_json)
+                else:
+                    job_info["company_research"] = {"raw_data": research_text[:2000]}
+        else:
+            print("  ⚠️ 회사명 추출 실패. 리서치 건너뜀.")
+
+        # 메타데이터 추가
+        job_info["_meta"] = {
+            "source_url": source_url,
+            "crawled_at": datetime.now().isoformat(),
+            "site": site,
+            "manual_fallback_used": True,
+        }
+
+        return job_info
 
     def _print_summary(self, results: dict):
         """실행 결과 요약 출력"""
@@ -434,10 +716,6 @@ def load_existing_profile(json_path: str) -> dict:
 # CLI 엔트리포인트
 # ============================================================
 def main():
-    backend_default = os.getenv("BACKEND1_LLM_BACKEND", "openai").strip().lower()
-    if backend_default not in ("openai", "huggingface", "ollama"):
-        backend_default = "openai"
-
     parser = argparse.ArgumentParser(
         description="자소서 생성 에이전트: PDF/URL → JSON 추출"
     )
@@ -447,21 +725,9 @@ def main():
     parser.add_argument(
         "--backend",
         type=str,
-        choices=["openai", "huggingface", "ollama"],
-        default=backend_default,
+        choices=["huggingface", "ollama"],
+        default="huggingface",
         help="LLM 백엔드 선택",
-    )
-    parser.add_argument(
-        "--model",
-        type=str,
-        default=os.getenv("BACKEND1_MODEL", ""),
-        help="백엔드별 모델명 (예: gpt-4.1-mini, qwen2.5)",
-    )
-    parser.add_argument(
-        "--temperature",
-        type=float,
-        default=float(os.getenv("BACKEND1_TEMPERATURE", "0.3")),
-        help="생성 temperature (기본 0.3)",
     )
     parser.add_argument("--hf-token", type=str, help="HuggingFace API 토큰")
     parser.add_argument(
@@ -481,8 +747,6 @@ def main():
     agent = FirstAgent(
         llm_backend=args.backend,
         hf_token=args.hf_token,
-        model_name=args.model,
-        temperature=args.temperature,
     )
 
     # 기존 프로필 사용 모드
