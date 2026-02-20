@@ -238,4 +238,7 @@ SETTINGS = {
     "retry_delay": 2.0,
     "chunk_max_chars": 3000,
     "chunk_overlap_chars": 200,
+    "job_posting_min_text_chars": 800,
+    "job_posting_image_max_count": 6,
+    "job_posting_image_max_bytes": 8_000_000,
 }

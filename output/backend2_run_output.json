@@ -1,24 +1,24 @@
 {
   "company_info": {
-    "name": "㈜퍼블릭에이아이",
+    "name": "뉴앤디",
     "team": "지원 팀",
-    "role": "AI 컨설턴트"
+    "role": "React Native 개발자"
   },
-  "scale": "Startup",
+  "scale": "Medium",
   "insights": {
-    "business_hook": "㈜퍼블릭에이아이는 AI 기술을 바탕으로 맞춤형 솔루션 개발과 연구를 선도하는 스타트업으로, 성장지향성과 계획성을 갖춘 인재를 필요로 합니다. 저는 LLM·LangChain 기반 AI 에이전트 설계 및 개발 경험을 통해 End-to-End 프로세스를 직접 수행하며, 빠르게 변화하는 AI 환경에서 지속적으로 성장해왔기에 퍼블릭에이아이의 혁신과 성장에 기여할 수 있습니다.",
-    "tech_hook": "퍼블릭에이아이의 AI 컨설턴트 직무는 경력무관이나 AI 기술에 대한 깊은 이해와 실무 경험을 요구합니다. 저는 LangChain, LangGraph 등 AI 에이전트 생태계와 Python, OpenAI API, Prompt Engineering 등 LLM 운영 기술을 보유하고 있으며, 잡곡 추천 및 IoT 제어 통합 AI 에이전트 개발과 문서 자동화 파이프라인 설계 경험을 통해 실무 중심의 AI 솔루션 개발 역량을 갖추고 있습니다.",
-    "culture_hook": "퍼블릭에아이의 인재상인 성장지향성, 계획성, 성취지향성, 꼼꼼함, 협동심과 일치하게, 저는 체계적인 시나리오 설계와 하이브리드 에이전트 아키텍처 개발을 주도하며 협업을 통해 기술적 가치를 창출해왔습니다. 또한, AI 에이전트 기술 서적 공동 집필 경험을 통해 동료와 지식을 공유하며 협동심을 발휘하는 협업 스타일을 갖추고 있습니다."
+    "business_hook": "뉴앤디가 글로벌 K-Trend 직구 서비스 veasly를 통해 해외 시장에서 빠르게 성장하는 가운데, 사용자 중심적 디지털 제품 디자인 경험을 가진 저는 고객이 쉽고 빠르게 한국 브랜드를 경험할 수 있도록 혁신적인 사용자 경험 개선에 기여하고자 지원합니다.",
+    "tech_hook": "React Native 개발자 직무에서 요구하는 Expo 환경과 웹뷰-네이티브 간 연동 설계 경험은 부족하지만, JavaScript와 협업 도구(Figma, Adobe Creative Suite 등)를 활용한 UI/UX 설계 경험을 바탕으로 빠르게 기술 역량을 확장하며 사용자 친화적인 앱 개발에 기여할 준비가 되어 있습니다.",
+    "culture_hook": "뉴앤디가 빠르고 공격적인 글로벌 성장과 협업, 코드 품질 개선을 중시하는 문화 속에서, 저는 팀워크와 커뮤니케이션을 바탕으로 다양한 이해관계자와 협력하여 성공적인 결과물을 도출하는 협업 스타일로 회사의 책임감과 실행력, 고객 중심 가치를 실현하는 데 기여할 것입니다."
   },
   "llm_invoke": {
     "invoked": true,
-    "raw_response": "{\n  \"business_hook\": \"㈜퍼블릭에이아이는 AI 기술을 바탕으로 맞춤형 솔루션 개발과 연구를 선도하는 스타트업으로, 성장지향성과 계획성을 갖춘 인재를 필요로 합니다. 저는 LLM·LangChain 기반 AI 에이전트 설계 및 개발 경험을 통해 End-to-End 프로세스를 직접 수행하며, 빠르게 변화하는 AI 환경에서 지속적으로 성장해왔기에 퍼블릭에이아이의 혁신과 성장에 기여할 수 있습니다.\",\n  \"tech_hook\": \"퍼블릭에이아이의 AI 컨설턴트 직무는 경력무관이나 AI 기술에 대한 깊은 이해와 실무 경험을 요구합니다. 저는 LangChain, LangGraph 등 AI 에이전트 생태계와 Python, OpenAI API, Prompt Engineering 등 LLM 운영 기술을 보유하고 있으며, 잡곡 추천 및 IoT 제어 통합 AI 에이전트 개발과 문서 자동화 파이프라인 설계 경험을 통해 실무 중심의 AI 솔루션 개발 역량을 갖추고 있습니다.\",\n  \"culture_hook\": \"퍼블릭에아이의 인재상인 성장지향성, 계획성, 성취지향성, 꼼꼼함, 협동심과 일치하게, 저는 체계적인 시나리오 설계와 하이브리드 에이전트 아키텍처 개발을 주도하며 협업을 통해 기술적 가치를 창출해왔습니다. 또한, AI 에이전트 기술 서적 공동 집필 경험을 통해 동료와 지식을 공유하며 협동심을 발휘하는 협업 스타일을 갖추고 있습니다.\"\n}",
+    "raw_response": "{\n  \"business_hook\": \"뉴앤디가 글로벌 K-Trend 직구 서비스 veasly를 통해 해외 시장에서 빠르게 성장하는 가운데, 사용자 중심적 디지털 제품 디자인 경험을 가진 저는 고객이 쉽고 빠르게 한국 브랜드를 경험할 수 있도록 혁신적인 사용자 경험 개선에 기여하고자 지원합니다.\",\n  \"tech_hook\": \"React Native 개발자 직무에서 요구하는 Expo 환경과 웹뷰-네이티브 간 연동 설계 경험은 부족하지만, JavaScript와 협업 도구(Figma, Adobe Creative Suite 등)를 활용한 UI/UX 설계 경험을 바탕으로 빠르게 기술 역량을 확장하며 사용자 친화적인 앱 개발에 기여할 준비가 되어 있습니다.\",\n  \"culture_hook\": \"뉴앤디가 빠르고 공격적인 글로벌 성장과 협업, 코드 품질 개선을 중시하는 문화 속에서, 저는 팀워크와 커뮤니케이션을 바탕으로 다양한 이해관계자와 협력하여 성공적인 결과물을 도출하는 협업 스타일로 회사의 책임감과 실행력, 고객 중심 가치를 실현하는 데 기여할 것입니다.\"\n}",
     "parse_success": true,
     "used_fallback": false,
     "parsed_json": {
-      "business_hook": "㈜퍼블릭에이아이는 AI 기술을 바탕으로 맞춤형 솔루션 개발과 연구를 선도하는 스타트업으로, 성장지향성과 계획성을 갖춘 인재를 필요로 합니다. 저는 LLM·LangChain 기반 AI 에이전트 설계 및 개발 경험을 통해 End-to-End 프로세스를 직접 수행하며, 빠르게 변화하는 AI 환경에서 지속적으로 성장해왔기에 퍼블릭에이아이의 혁신과 성장에 기여할 수 있습니다.",
-      "tech_hook": "퍼블릭에이아이의 AI 컨설턴트 직무는 경력무관이나 AI 기술에 대한 깊은 이해와 실무 경험을 요구합니다. 저는 LangChain, LangGraph 등 AI 에이전트 생태계와 Python, OpenAI API, Prompt Engineering 등 LLM 운영 기술을 보유하고 있으며, 잡곡 추천 및 IoT 제어 통합 AI 에이전트 개발과 문서 자동화 파이프라인 설계 경험을 통해 실무 중심의 AI 솔루션 개발 역량을 갖추고 있습니다.",
-      "culture_hook": "퍼블릭에아이의 인재상인 성장지향성, 계획성, 성취지향성, 꼼꼼함, 협동심과 일치하게, 저는 체계적인 시나리오 설계와 하이브리드 에이전트 아키텍처 개발을 주도하며 협업을 통해 기술적 가치를 창출해왔습니다. 또한, AI 에이전트 기술 서적 공동 집필 경험을 통해 동료와 지식을 공유하며 협동심을 발휘하는 협업 스타일을 갖추고 있습니다."
+      "business_hook": "뉴앤디가 글로벌 K-Trend 직구 서비스 veasly를 통해 해외 시장에서 빠르게 성장하는 가운데, 사용자 중심적 디지털 제품 디자인 경험을 가진 저는 고객이 쉽고 빠르게 한국 브랜드를 경험할 수 있도록 혁신적인 사용자 경험 개선에 기여하고자 지원합니다.",
+      "tech_hook": "React Native 개발자 직무에서 요구하는 Expo 환경과 웹뷰-네이티브 간 연동 설계 경험은 부족하지만, JavaScript와 협업 도구(Figma, Adobe Creative Suite 등)를 활용한 UI/UX 설계 경험을 바탕으로 빠르게 기술 역량을 확장하며 사용자 친화적인 앱 개발에 기여할 준비가 되어 있습니다.",
+      "culture_hook": "뉴앤디가 빠르고 공격적인 글로벌 성장과 협업, 코드 품질 개선을 중시하는 문화 속에서, 저는 팀워크와 커뮤니케이션을 바탕으로 다양한 이해관계자와 협력하여 성공적인 결과물을 도출하는 협업 스타일로 회사의 책임감과 실행력, 고객 중심 가치를 실현하는 데 기여할 것입니다."
     }
   },
   "diagnostics": {
@@ -31,23 +31,27 @@
     "user_profile_attached": true
   },
   "reference_urls": [
-    "http://cpdcenter.re.kr/cdn/upload/board/NRC_%ED%98%91%EB%8F%99%EC%97%B0%EA%B5%AC_AI%EB%A5%BC_%ED%99%9C%EC%9A%A9%ED%95%9C_%EA%B3%B5%EA%B3%B5%EB%B6%80%EB%AC%B8_%EC%9D%B8%EC%9E%AC%EC%B1%84%EC%9A%A9%EA%B3%BC%EC%A0%95%EC%97%90%EC%84%9C%EC%9D%98_%EA%B3%B5%EA%B3%B5%EA%B0%80%EC%B9%98_%EC%A6%9D%EC%A7%84%EB%B0%A9%EC%95%88_%ED%96%89%EC%A0%95%EC%97%B0_(1).pdf",
-    "https://hiseoul.sba.kr/Pages/AccountDetail.aspx?id=e774b41a-fd01-4e97-acb5-f3018c6fb2cb",
-    "https://job.pusan.ac.kr/attachment/download/1437902/%5B%EB%B0%B0%ED%8F%AC%EC%9A%A9+%EC%9D%BC%EB%B0%98%5D+2024+%EC%A0%9C1%EC%B0%A8+KB%EA%B5%BF%EC%9E%A1+%EC%9A%B0%EC%88%98%EA%B8%B0%EC%97%85+%EC%B7%A8%EC%97%85%EB%B0%95%EB%9E%8C%ED%9A%8C_%EC%B0%B8%EA%B0%80%EA%B8%B0%EC%97%85+%EB%A6%AC%EC%8A%A4%ED%8A%B8_ver1.xlsx",
-    "https://kind.krx.co.kr/external/dst/irReference/17902/%EC%9C%A0%EB%9D%BC%ED%81%B4_IR%20Book_20251215_V1.0.pdf",
-    "https://publicai.network/",
-    "https://www.aiexpo.co.kr/en/",
-    "https://www.etnews.com/20251225000025",
-    "https://www.forbeskorea.co.kr/news/articleView.html?idxno=400559",
+    "https://blog.adebayo.dev/posts/building-a-universal-react-app-with-expo-nextjs-nativewind",
+    "https://blog.ninehire.com/corporate-innovation",
+    "https://cms.handong.edu/dcp/editor/files/2024_12%20%ED%95%9C%EB%8F%99%EB%8C%80%20%EC%A7%84%EB%A1%9C%EA%B0%80%EC%9D%B4%EB%93%9C%EB%B6%81_%EB%82%B1%EC%9E%A5_compressed.pdf",
+    "https://expo.dev/blog/from-a-brownfield-react-native-and-next-js-stack-to-one-expo-app",
+    "https://expo.dev/blog/from-web-to-native-with-react",
+    "https://github.com/devpools/devpools.github.io/blob/master/content.json",
+    "https://hotssul.com/bbs/board.php?bo_table=ssul19&wr_id=560459",
+    "https://huggingface.co/deliciouscat/kf-deberta-base-cross-nli/commit/9415c42742d3030adb1b3653c4c17c815f00b064.diff?file=vocab.txt",
+    "https://kr.linkedin.com/company/newndy",
+    "https://m.blog.naver.com/PostView.naver?blogId=mynameisdj&logNo=223678363999",
+    "https://research1039.rssing.com/chan-19369390/all_p6.html",
+    "https://s-space.snu.ac.kr/bitstream/10371/29932/3/management_information_v17_01_p59.pdf",
+    "https://thevc.kr/newndy",
+    "https://tkor097.com/웹툰/금",
+    "https://vcletter.co.kr/fileupload/pdf/2021_KVIC-24-KR.pdf",
+    "https://www.firstmancamp.com/image/kosme_scop/Leadership%20for%20Strategic%20Execution%20Excellence.pdf",
+    "https://www.hanmiglobal.com/kr/data/brochure.pdf",
+    "https://www.hanwhavision.com/wp-content/uploads/2025/04/%ED%95%9C%ED%99%94%EB%B9%84%EC%A0%84%EC%82%AC%EC%97%85%EB%B3%B4%EA%B3%A0%EC%84%9C2025.03.17.pdf",
     "https://www.inha.ac.kr/bbs/kr/8/38558/download.do",
-    "https://www.innoforest.co.kr/company/CP00021012/%ED%8D%BC%EB%B8%94%EB%A6%AD%EC%97%90%EC%9D%B4%EC%95%84%EC%9D%B4",
-    "https://www.jobkorea.co.kr/recruit/co_read/c/deep1809",
-    "https://www.joongang.co.kr/ailearning/news",
-    "https://www.navercorp.com/navercorp_/ir/sustainabilityReport/NAVER_2021_ESG_KOR.pdf",
-    "https://www.publicai.co.kr/",
-    "https://www.publicai.co.kr/AI-%EA%B0%9C%EB%B0%9C",
-    "https://www.pulmuone.co.kr/pulmuone/data/pulmuone_statement_affairs_2025.pdf",
-    "https://www.thepublic.kr/news/articleView.html?idxno=294622",
-    "https://www.webcashaicfo.com/"
+    "https://www.ls-electric.com/ko/company/data/2021_year.pdf",
+    "https://www.stechstar.com/user/wordpress/category/%ED%95%99%EC%8A%B5%EC%9E%90%EB%A3%8C/",
+    "https://www.wanted.co.kr/wd/294759"
   ]
 }

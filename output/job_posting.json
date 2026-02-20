@@ -1,70 +1,44 @@
 {
   "company": {
-    "name": "뤼튼테크놀로지스",
-    "industry": "IT, 컨텐츠",
+    "name": "㈜퍼블릭에이아이",
+    "industry": "",
     "size": "",
-    "location": "서울특별시 서초구 서초대로77길 17, 14층"
+    "location": "서울 서초구 양재대로12길 56 (양재동, 엠피리온디지털AI캠퍼스) A동 802호"
   },
   "position": {
-    "title": "Agentic AI 개발자",
-    "department": "AX CIC",
-    "job_type": "경력",
-    "employment_type": "정규직"
+    "title": "AI 컨설턴트",
+    "department": "",
+    "job_type": "경력무관",
+    "employment_type": "계약직"
   },
   "requirements": {
-    "main_tasks": [
-      "기업, 공공기관 등 클라이언트 요구사항에 따른 Agentic AI 개발",
-      "MCP 서버 구축 및 Agent Orchestration 업무 진행",
-      "팀원들의 생산성 향상을 위한 Agent 플랫폼 개발"
-    ],
+    "main_tasks": [],
     "qualifications": [
-      "어떤 영역에서든 상위 1%의 역량 증명",
-      "Researcher mindset 보유 (깊은 사고력, 창의력, 끈기, 명석한 자기주도형 인재)",
-      "AI 기술에 대한 높은 이해도 또는 2주 이내 빠른 온보딩 가능",
-      "일에 대한 높은 중요도 인식",
-      "빠른 학습 능력 보유",
-      "정확한 소통 능력",
-      "높은 업무 강도에 대한 회복 탄력성",
-      "기술을 통한 비즈니스 임팩트 경험",
-      "Python 혹은 Node.js 능숙",
-      "OpenAI SDK, Vercel AI SDK 등 LLM 관련 라이브러리 활용 경험"
+      "대졸 이상"
     ],
     "preferred": [],
-    "tech_stack": [
-      "Python",
-      "Node.js",
-      "OpenAI SDK",
-      "Vercel AI SDK"
-    ]
+    "tech_stack": []
   },
   "talent_keywords": [
-    "Researcher mindset",
-    "깊은 사고력",
-    "창의력",
-    "끈기",
-    "자기주도형",
-    "빠른 학습 능력",
-    "정확한 소통",
-    "회복 탄력성",
-    "비즈니스 임팩트"
+    "성장지향성",
+    "계획성",
+    "성취지향성",
+    "꼼꼼함",
+    "협동심"
   ],
   "benefits": [],
-  "deadline": "상시채용",
+  "deadline": "",
   "essay_questions": [],
   "company_research": {
-    "mission_vision": "AI로 사람들의 삶을 혁신하며, 생성형 AI를 통한 산업 혁명을 대비하고 Human-like Agent를 세상에 보급하는 것을 목표로 함",
-    "core_business": [
-      "AI 플랫폼 뤼튼 운영",
-      "AI 캐릭터 서비스 크랙",
-      "기업 업무 재정의 에이전트 AX 개발"
-    ],
+    "mission_vision": "",
+    "core_business": [],
     "recent_news": [],
-    "tech_culture": "빠른 시도와 실패에서 배우며, 잘 되는 것에 집중하는 문화",
-    "growth_direction": "생성형 AI 기반 산업 혁명 대비 및 Human-like Agent 보급 확대"
+    "tech_culture": "",
+    "growth_direction": ""
   },
   "_meta": {
-    "source_url": "https://www.wanted.co.kr/wd/324180",
-    "crawled_at": "2026-02-20T11:26:02.029233",
-    "site": "wanted"
+    "source_url": "https://www.jobkorea.co.kr/Recruit/GI_Read/48552548?sc=322",
+    "crawled_at": "2026-02-20T16:10:13.483349",
+    "site": "jobkorea"
   }
 }

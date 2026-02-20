@@ -223,6 +223,91 @@ class FirstAgent:
         return base
 
     # ============================================================
+    # Task B-0: 텍스트 → 채용공고 JSON
+    # ============================================================
+    def extract_job_posting_from_text(
+        self,
+        raw_text: str,
+        source_url: str = "",
+        site: str = "manual",
+        company_hint: str = "",
+        title_hint: str = "",
+    ) -> dict:
+        """
+        수집/입력된 채용공고 텍스트를 JOB_POSTING_SCHEMA에 맞게 구조화
+        (URL 크롤링 실패 시 수동 텍스트/이미지 OCR fallback에서도 사용)
+        """
+        normalized_text = str(raw_text or "").strip()
+        if not normalized_text:
+            return {"url": source_url, "error": "공고 텍스트 없음"}
+
+        print("\n[STEP] LLM으로 공고 정보 구조화 중...")
+        schema_str = json.dumps(JOB_POSTING_SCHEMA, ensure_ascii=False, indent=2)
+        prompt = PROMPTS["extract_job_posting"].format(
+            schema=schema_str, text=normalized_text
+        )
+        job_info = self.llm.generate_json(prompt)
+
+        if not isinstance(job_info, dict) or not job_info:
+            print("  [WARN] LLM 파싱 실패. 입력 텍스트 기반 기본 구조 사용")
+            job_info = {
+                "company": {"name": company_hint or ""},
+                "position": {"title": title_hint or ""},
+                "raw_sections": [{"header": "raw_text", "content": normalized_text[:5000]}],
+            }
+
+        company_block = job_info.setdefault("company", {})
+        if not isinstance(company_block, dict):
+            company_block = {}
+            job_info["company"] = company_block
+        if company_hint and not str(company_block.get("name") or "").strip():
+            company_block["name"] = company_hint
+
+        position_block = job_info.setdefault("position", {})
+        if not isinstance(position_block, dict):
+            position_block = {}
+            job_info["position"] = position_block
+        if title_hint and not str(position_block.get("title") or "").strip():
+            position_block["title"] = title_hint
+
+        # Step 3: 회사 리서치 (추가 정보 수집)
+        company_name = str(company_block.get("name") or "").strip()
+        position = str(position_block.get("title") or "").strip()
+        if company_name:
+            print(f"\n[STEP] 회사 리서치 수행 중... ({company_name})")
+            research = self.researcher.research(company_name, position)
+
+            # Step 4: 리서치 결과를 LLM으로 정리
+            print("\n[STEP] 리서치 결과 정리 중...")
+            research_text = format_research_for_llm(research)
+
+            if research_text != "검색 결과 없음":
+                research_prompt = PROMPTS["research_company"].format(
+                    company_name=company_name,
+                    position=position,
+                    search_results=research_text[:3000],
+                )
+                research_json = self.llm.generate_json(research_prompt)
+
+                if isinstance(research_json, dict) and research_json:
+                    job_info.setdefault("company_research", {}).update(research_json)
+                else:
+                    job_info["company_research"] = {"raw_data": research_text[:2000]}
+        else:
+            print("  [WARN] 회사명 추출 실패. 리서치 건너뜀.")
+
+        # 메타데이터 추가
+        meta = {
+            "source_url": source_url,
+            "crawled_at": datetime.now().isoformat(),
+            "site": site or "manual",
+        }
+        if str(site or "").startswith("manual"):
+            meta["manual_fallback_used"] = True
+        job_info["_meta"] = meta
+        return job_info
+
+    # ============================================================
     # Task B: URL → 채용공고 + 회사 리서치 JSON
     # ============================================================
     def extract_job_posting(self, url: str) -> dict:
@@ -243,67 +328,20 @@ class FirstAgent:
         print(f"\n1️⃣ 채용공고 크롤링 중...")
         crawl_result = self.job_crawler.crawl(url)
 
-        if not crawl_result.get("raw_text"):
+        raw_text = str(crawl_result.get("raw_text") or "").strip()
+        if not raw_text:
             print("  ❌ 채용공고 텍스트를 가져올 수 없습니다.")
             return {"url": url, "error": "크롤링 실패"}
 
-        # Step 2: LLM으로 공고 정보 구조화
-        print(f"\n2️⃣ LLM으로 공고 정보 구조화 중...")
-        schema_str = json.dumps(JOB_POSTING_SCHEMA, ensure_ascii=False, indent=2)
-        prompt = PROMPTS["extract_job_posting"].format(
-            schema=schema_str, text=crawl_result["raw_text"]
+        parsed = crawl_result.get("parsed")
+        parsed_dict = parsed if isinstance(parsed, dict) else {}
+        return self.extract_job_posting_from_text(
+            raw_text=raw_text,
+            source_url=url,
+            site=str(crawl_result.get("site") or ""),
+            company_hint=str(parsed_dict.get("company") or "").strip(),
+            title_hint=str(parsed_dict.get("title") or "").strip(),
         )
-        job_info = self.llm.generate_json(prompt)
-
-        if not job_info:
-            print("  ⚠️ LLM 파싱 실패. 크롤링 원본 데이터 사용")
-            job_info = {
-                "company": {"name": crawl_result["parsed"].get("company", "")},
-                "position": {"title": crawl_result["parsed"].get("title", "")},
-                "raw_sections": crawl_result["parsed"].get("sections", []),
-            }
-
-        # Step 3: 회사 리서치 (추가 정보 수집)
-        company_name = (
-            job_info.get("company", {}).get("name", "")
-            or crawl_result["parsed"].get("company", "")
-        )
-        position = (
-            job_info.get("position", {}).get("title", "")
-            or crawl_result["parsed"].get("title", "")
-        )
-
-        if company_name:
-            print(f"\n3️⃣ 회사 리서치 수행 중... ({company_name})")
-            research = self.researcher.research(company_name, position)
-
-            # Step 4: 리서치 결과를 LLM으로 정리
-            print(f"\n4️⃣ 리서치 결과 정리 중...")
-            research_text = format_research_for_llm(research)
-
-            if research_text != "검색 결과 없음":
-                research_prompt = PROMPTS["research_company"].format(
-                    company_name=company_name,
-                    position=position,
-                    search_results=research_text[:3000],
-                )
-                research_json = self.llm.generate_json(research_prompt)
-
-                if research_json:
-                    job_info.setdefault("company_research", {}).update(research_json)
-                else:
-                    job_info["company_research"] = {"raw_data": research_text[:2000]}
-        else:
-            print("  ⚠️ 회사명 추출 실패. 리서치 건너뜀.")
-
-        # 메타데이터 추가
-        job_info["_meta"] = {
-            "source_url": url,
-            "crawled_at": datetime.now().isoformat(),
-            "site": crawl_result["site"],
-        }
-
-        return job_info
 
     # ============================================================
     # 통합 실행

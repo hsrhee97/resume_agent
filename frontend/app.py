@@ -8,6 +8,7 @@ from dotenv import load_dotenv
 
 from frontend.pipeline import (
     get_hf_token,
+    is_job_posting_usable,
     persist_uploaded_pdf,
     run_company_research,
     run_essay_writer,
@@ -73,6 +74,10 @@ def _init_session_state() -> None:
         st.session_state.essay_result = {}
     if "company_info" not in st.session_state:
         st.session_state.company_info = {"name": "", "team": "", "role": ""}
+    if "need_job_fallback" not in st.session_state:
+        st.session_state.need_job_fallback = False
+    if "pending_job_url" not in st.session_state:
+        st.session_state.pending_job_url = ""
 
 
 def main() -> None:
@@ -98,6 +103,20 @@ def main() -> None:
 
     uploaded_pdf = st.file_uploader("기존 자소서 PDF 업로드", type=["pdf"])
     job_url = st.text_input("채용공고 URL")
+    job_text_fallback = ""
+    job_image_fallbacks: list = []
+    if st.session_state.need_job_fallback:
+        st.info("URL 추출이 실패했습니다. 아래에 공고 텍스트 또는 공고 캡처 이미지를 입력해 주세요.")
+        job_text_fallback = st.text_area(
+            "URL 추출 실패 시 사용할 채용공고 텍스트 (선택)",
+            height=180,
+            placeholder="공고 본문을 붙여 넣으면 URL 추출 실패 시 fallback으로 사용됩니다.",
+        )
+        job_image_fallbacks = st.file_uploader(
+            "URL 추출 실패 시 사용할 채용공고 캡처 이미지 (선택, 여러 장 가능)",
+            type=["png", "jpg", "jpeg", "webp", "bmp"],
+            accept_multiple_files=True,
+        )
 
     _render_messages()
 
@@ -110,8 +129,24 @@ def main() -> None:
         st.markdown(user_prompt)
 
     if not st.session_state.pipeline_ready:
-        if uploaded_pdf is None or not job_url.strip():
-            warning_msg = "PDF 업로드와 채용공고 URL 입력이 필요합니다. 두 항목을 채운 뒤 다시 요청해 주세요."
+        if uploaded_pdf is None:
+            warning_msg = "PDF 업로드가 필요합니다. 업로드 후 다시 요청해 주세요."
+            _append_message("assistant", warning_msg)
+            with st.chat_message("assistant"):
+                st.markdown(warning_msg)
+            return
+
+        effective_job_url = job_url.strip() or st.session_state.pending_job_url
+        if not effective_job_url:
+            warning_msg = "채용공고 URL을 입력해 주세요."
+            _append_message("assistant", warning_msg)
+            with st.chat_message("assistant"):
+                st.markdown(warning_msg)
+            return
+        if st.session_state.need_job_fallback and not (
+            bool(job_text_fallback.strip()) or bool(job_image_fallbacks)
+        ):
+            warning_msg = "URL 추출 실패 상태입니다. 공고 텍스트 또는 캡처 이미지 중 하나를 입력해 주세요."
             _append_message("assistant", warning_msg)
             with st.chat_message("assistant"):
                 st.markdown(warning_msg)
@@ -120,17 +155,38 @@ def main() -> None:
         with st.chat_message("assistant"):
             with st.status("자소서 생성 파이프라인 실행 중", expanded=True) as status:
                 try:
-                    status.write("1/3 기존 자소서와 채용 공고를 우리 스키마에 맞게 정리하는 중")
+                    if st.session_state.need_job_fallback:
+                        status.write("1/3 기존 자소서와 수동 입력 공고 텍스트를 우리 스키마에 맞게 정리하는 중")
+                    else:
+                        status.write("1/3 기존 자소서와 채용 공고를 우리 스키마에 맞게 정리하는 중")
                     pdf_path = persist_uploaded_pdf(uploaded_pdf, output_dir=Path("output"))
                     user_profile, job_posting = run_schema_extraction(
                         pdf_path=str(pdf_path),
-                        job_url=job_url.strip(),
+                        job_url=effective_job_url,
                         llm_backend=llm_backend,
                         hf_token=get_hf_token(),
                         model_name=backend1_model_name,
                         temperature=temperature,
+                        job_text_fallback=job_text_fallback if st.session_state.need_job_fallback else "",
+                        job_images=(job_image_fallbacks or []) if st.session_state.need_job_fallback else [],
                         output_dir=Path("output"),
                     )
+                    if not is_job_posting_usable(job_posting):
+                        st.session_state.user_profile = user_profile
+                        st.session_state.need_job_fallback = True
+                        st.session_state.pending_job_url = effective_job_url
+                        status.update(label="추가 입력 필요", state="error")
+                        fallback_msg = (
+                            "채용공고 URL에서 본문 추출이 충분하지 않습니다. "
+                            "이제 화면에 표시된 입력칸에 공고 텍스트 또는 공고 캡처 이미지를 넣고 다시 요청해 주세요."
+                        )
+                        _append_message("assistant", fallback_msg)
+                        st.markdown(fallback_msg)
+                        return
+
+                    meta = job_posting.get("_meta", {}) if isinstance(job_posting, dict) else {}
+                    if isinstance(meta, dict) and meta.get("manual_fallback_used"):
+                        status.write("1/3 URL 추출이 부족해 수동 텍스트/캡처 OCR fallback을 사용했습니다.")
 
                     status.write("2/3 회사 정보를 조사하고 직무 인사이트를 모으는 중")
                     research_result, company, team, role = run_company_research(
@@ -161,6 +217,8 @@ def main() -> None:
                     st.session_state.essay_result = essay_result
                     st.session_state.company_info = {"name": company, "team": team, "role": role}
                     st.session_state.pipeline_ready = True
+                    st.session_state.need_job_fallback = False
+                    st.session_state.pending_job_url = ""
 
                     status.update(label="완료", state="complete")
                     assistant_msg = _format_essay_markdown(essay_templates)
