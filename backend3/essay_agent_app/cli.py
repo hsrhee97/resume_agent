@@ -72,6 +72,11 @@ def main() -> None:
     parser.add_argument("--team", default="", help="Override team name")
     parser.add_argument("--role", default="", help="Override role name")
     parser.add_argument(
+        "--revision-instruction",
+        default="",
+        help="Optional follow-up instruction to refine essay output",
+    )
+    parser.add_argument(
         "--user-profile-json",
         default=DEFAULT_USER_PROFILE_JSON,
         help="Path to backend1 output user_profile.json",
@@ -117,6 +122,7 @@ def main() -> None:
             company_name=args.company,
             team_name=args.team,
             role_name=args.role,
+            revision_instruction=args.revision_instruction,
             model=args.model,
             temperature=args.temperature,
         )

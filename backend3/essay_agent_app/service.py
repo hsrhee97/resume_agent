@@ -98,6 +98,13 @@ def _sanitize_hook_text(text: str) -> str:
     return cleaned
 
 
+def _normalize_revision_instruction(text: str) -> str:
+    cleaned = str(text or "").strip()
+    if not cleaned:
+        return "없음"
+    return re.sub(r"\s+", " ", cleaned)
+
+
 def create_default_llm(model: str = "gpt-4.1-mini", temperature: float = 0.3) -> Any:
     try:
         from langchain_openai import ChatOpenAI
@@ -199,6 +206,7 @@ def generate_essay_drafts(
     company_name: str = "",
     team_name: str = "",
     role_name: str = "",
+    revision_instruction: str = "",
     model: str = "gpt-4.1-mini",
     temperature: float = 0.3,
 ) -> dict[str, Any]:
@@ -231,6 +239,7 @@ def generate_essay_drafts(
     user_profile_context = format_user_profile_context(user_profile)
     job_posting_context = format_job_posting_context(job_posting)
     research_context = format_research_context(research_result)
+    revision_instruction_text = _normalize_revision_instruction(revision_instruction)
 
     essays: Optional[dict[str, str]] = None
     llm = create_default_llm(model=model, temperature=temperature)
@@ -241,6 +250,7 @@ def generate_essay_drafts(
             user_profile_context=user_profile_context,
             job_posting_context=job_posting_context,
             research_context=research_context,
+            revision_instruction=revision_instruction_text,
         )
         try:
             llm_invoke["invoked"] = True
@@ -276,6 +286,7 @@ def generate_essay_drafts(
             "user_profile_attached": bool(user_profile),
             "job_posting_attached": bool(job_posting),
             "research_result_attached": bool(research_result),
+            "revision_instruction_attached": revision_instruction_text != "없음",
         },
         "generated_at": datetime.now().isoformat(),
     }
