@@ -487,6 +487,10 @@ def _init_state() -> None:
         "job_url_input": "",
         "fallback_job_text": "",
         "current_view": "landing",
+        "is_test_user_authenticated": False,
+        "test_user_id": "",
+        "test_login_id": "",
+        "test_login_password": "",
     }
     for key, value in defaults.items():
         if key not in st.session_state:
@@ -622,6 +626,10 @@ def _submit_pipeline(
     fallback_text: str,
     fallback_images: list[Any],
 ) -> None:
+    if not bool(st.session_state.get("is_test_user_authenticated", False)):
+        st.error("테스트 계정 로그인 후 이용 가능합니다. 게스트는 샘플 결과 보기만 사용할 수 있습니다.")
+        return
+
     if uploaded_pdf is None:
         st.error("이력서 PDF를 먼저 업로드해 주세요.")
         return
@@ -867,6 +875,45 @@ def _load_sample_outputs() -> tuple[bool, str]:
     return True, "Sample outputs loaded from output/*.json."
 
 
+def _expected_test_credentials() -> tuple[str, str]:
+    login_id = os.getenv("TEST_LOGIN_ID", "").strip()
+    login_password = os.getenv("TEST_LOGIN_PASSWORD", "").strip()
+    if not login_id:
+        login_id = "coverfit_test"
+    if not login_password:
+        login_password = "coverfit_test_pw"
+    return login_id, login_password
+
+
+def _authenticate_test_user(login_id: str, login_password: str) -> tuple[bool, str]:
+    user_id = str(login_id or "").strip()
+    password = str(login_password or "")
+    if not user_id or not password:
+        return False, "테스트 ID와 비밀번호를 모두 입력해 주세요."
+
+    expected_id, expected_password = _expected_test_credentials()
+    if user_id == expected_id and password == expected_password:
+        st.session_state.is_test_user_authenticated = True
+        st.session_state.test_user_id = user_id
+        return True, "인증되었습니다. 맞춤 자소서 생성을 사용할 수 있습니다."
+    return False, "ID 또는 비밀번호가 올바르지 않습니다."
+
+
+def _logout_test_user() -> None:
+    st.session_state.is_test_user_authenticated = False
+    st.session_state.test_user_id = ""
+    st.session_state.test_login_id = ""
+    st.session_state.test_login_password = ""
+    st.session_state.pipeline_ready = False
+    st.session_state.need_job_fallback = False
+    st.session_state.pending_job_url = ""
+    st.session_state.fallback_job_text = ""
+    st.session_state.user_profile = {}
+    st.session_state.job_posting = {}
+    st.session_state.research_result = {}
+    st.session_state.essay_result = {}
+
+
 def _render_results() -> None:
     if not st.session_state.pipeline_ready:
         return
@@ -949,9 +996,36 @@ def _render_form_page() -> None:
         unsafe_allow_html=True,
     )
 
+    is_authenticated = bool(st.session_state.get("is_test_user_authenticated", False))
+    if is_authenticated:
+        auth_left, auth_right = st.columns([3, 1])
+        with auth_left:
+            user_id = str(st.session_state.get("test_user_id") or "").strip()
+            st.success(f"테스트 계정 인증 완료: {user_id}")
+        with auth_right:
+            if st.button("로그아웃", key="logout_test_user_btn", use_container_width=True):
+                _logout_test_user()
+                st.rerun()
+    else:
+        st.info("게스트는 샘플 결과 보기만 가능합니다. 맞춤 자소서 생성은 테스트 계정 로그인 후 사용할 수 있습니다.")
+        with st.form("coverfit_test_login_form", clear_on_submit=True):
+            login_id = st.text_input("테스트 ID", key="test_login_id")
+            login_password = st.text_input("테스트 비밀번호", type="password", key="test_login_password")
+            login_submitted = st.form_submit_button("테스트 로그인", use_container_width=True)
+        if login_submitted:
+            ok, message = _authenticate_test_user(login_id, login_password)
+            if ok:
+                st.success(message)
+                st.rerun()
+            else:
+                st.error(message)
+
     sample_col_text, sample_col_btn = st.columns([2.4, 1.0])
     with sample_col_text:
-        st.caption("UI preview mode: load existing output JSON without uploading PDF/URL.")
+        if is_authenticated:
+            st.caption("업로드 없이 결과 UI만 확인하려면 샘플 결과 보기를 사용할 수 있습니다.")
+        else:
+            st.caption("게스트 모드: 샘플 결과만 확인할 수 있습니다.")
     with sample_col_btn:
         if st.button("샘플 결과 보기", use_container_width=True, key="load_sample_outputs_btn"):
             ok, message = _load_sample_outputs()
@@ -960,7 +1034,10 @@ def _render_form_page() -> None:
             else:
                 st.warning(message)
 
-    _render_form()
+    if is_authenticated:
+        _render_form()
+    else:
+        st.caption("맞춤 자소서 생성 폼은 테스트 계정 로그인 후 활성화됩니다.")
     _render_results()
 
 
