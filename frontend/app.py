@@ -412,11 +412,16 @@ div[data-testid="stAlert"] {
   margin-bottom: 0.7rem;
 }
 
-.cf-results-shell {
-  border-radius: var(--cf-radius-lg);
-  border: 1px solid var(--cf-border);
-  background: var(--cf-surface);
-  padding: var(--cf-space-3);
+.cf-results-divider {
+  height: 1px;
+  margin: 0 0 var(--cf-space-3);
+  background: linear-gradient(
+    90deg,
+    rgba(56, 189, 248, 0.08) 0%,
+    rgba(148, 163, 184, 0.45) 22%,
+    rgba(148, 163, 184, 0.45) 78%,
+    rgba(56, 189, 248, 0.08) 100%
+  );
 }
 
 div[data-testid="stDownloadButton"] > button {
@@ -799,6 +804,69 @@ def _normalize_reference_urls(raw_urls: Any) -> list[str]:
     return cleaned
 
 
+def _load_json_object(path: Path) -> dict[str, Any]:
+    if not path.exists():
+        return {}
+
+    try:
+        raw = path.read_text(encoding="utf-8")
+    except UnicodeDecodeError:
+        raw = path.read_text(encoding="utf-8-sig")
+    except Exception:
+        return {}
+
+    try:
+        parsed = json.loads(raw)
+    except json.JSONDecodeError:
+        return {}
+
+    return parsed if isinstance(parsed, dict) else {}
+
+
+def _load_sample_outputs() -> tuple[bool, str]:
+    output_dir = Path("output")
+    user_profile = _load_json_object(output_dir / "user_profile.json")
+    job_posting = _load_json_object(output_dir / "job_posting.json")
+    research_result = _load_json_object(output_dir / "backend2_run_output.json")
+    essay_result = _load_json_object(output_dir / "backend3_essay_output.json")
+
+    if not essay_result:
+        return False, "output/backend3_essay_output.json file is missing or invalid."
+
+    essay_templates = essay_result.get("essay_templates", {})
+    if not isinstance(essay_templates, dict) or not essay_templates:
+        return False, "Sample file exists, but 'essay_templates' is empty."
+
+    company_name = ""
+    team_name = ""
+    role_name = ""
+
+    company_info = research_result.get("company_info", {}) if isinstance(research_result, dict) else {}
+    if isinstance(company_info, dict):
+        company_name = str(company_info.get("name") or "").strip()
+        team_name = str(company_info.get("team") or "").strip()
+        role_name = str(company_info.get("role") or "").strip()
+
+    if not company_name and isinstance(job_posting.get("company"), dict):
+        company_name = str(job_posting["company"].get("name") or "").strip()
+    if not team_name and isinstance(job_posting.get("position"), dict):
+        team_name = str(job_posting["position"].get("department") or "").strip()
+    if not role_name and isinstance(job_posting.get("position"), dict):
+        role_name = str(job_posting["position"].get("title") or "").strip()
+
+    st.session_state.user_profile = user_profile
+    st.session_state.job_posting = job_posting
+    st.session_state.research_result = research_result
+    st.session_state.essay_result = essay_result
+    st.session_state.company_info = {"name": company_name, "team": team_name, "role": role_name}
+    st.session_state.pipeline_ready = True
+    st.session_state.need_job_fallback = False
+    st.session_state.pending_job_url = ""
+    st.session_state.fallback_job_text = ""
+
+    return True, "Sample outputs loaded from output/*.json."
+
+
 def _render_results() -> None:
     if not st.session_state.pipeline_ready:
         return
@@ -809,7 +877,7 @@ def _render_results() -> None:
         return
 
     st.markdown("<h3 class='cf-results-title'>생성 결과</h3>", unsafe_allow_html=True)
-    st.markdown("<section class='cf-results-shell'>", unsafe_allow_html=True)
+    st.markdown("<div class='cf-results-divider'></div>", unsafe_allow_html=True)
 
     section_outputs: dict[str, str] = {}
     for idx, section in enumerate(SECTION_LABELS):
@@ -869,9 +937,6 @@ def _render_results() -> None:
             use_container_width=True,
         )
 
-    st.markdown("</section>", unsafe_allow_html=True)
-
-
 def _render_form_page() -> None:
     st.markdown(
         """
@@ -883,6 +948,18 @@ def _render_form_page() -> None:
 """,
         unsafe_allow_html=True,
     )
+
+    sample_col_text, sample_col_btn = st.columns([2.4, 1.0])
+    with sample_col_text:
+        st.caption("UI preview mode: load existing output JSON without uploading PDF/URL.")
+    with sample_col_btn:
+        if st.button("샘플 결과 보기", use_container_width=True, key="load_sample_outputs_btn"):
+            ok, message = _load_sample_outputs()
+            if ok:
+                st.success(message)
+            else:
+                st.warning(message)
+
     _render_form()
     _render_results()
 
