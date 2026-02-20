@@ -84,9 +84,16 @@ def main() -> None:
 
     with st.sidebar:
         st.subheader("실행 옵션")
-        llm_backend = st.selectbox("기존 자소서/공고 정리 모델", ("huggingface", "ollama"))
+        llm_backend = st.selectbox("기존 자소서/공고 정리 모델", ("openai", "ollama", "huggingface"))
         research_provider = st.selectbox("회사 조사 검색 공급자", ("tavily", "serper"))
-        model_name = st.text_input("작성 모델", value=os.getenv("OPENAI_MODEL", "gpt-4.1-mini"))
+        if llm_backend == "ollama":
+            backend1_default_model = os.getenv("BACKEND1_MODEL", os.getenv("OLLAMA_MODEL", "qwen2.5"))
+        elif llm_backend == "openai":
+            backend1_default_model = os.getenv("BACKEND1_MODEL", os.getenv("OPENAI_MODEL", "gpt-4.1-mini"))
+        else:
+            backend1_default_model = os.getenv("BACKEND1_MODEL", os.getenv("HF_MODEL", ""))
+        backend1_model_name = st.text_input("기존 자소서/공고 정리 모델명", value=backend1_default_model)
+        writer_model_name = st.text_input("회사 조사/자소서 작성 모델", value=os.getenv("OPENAI_MODEL", "gpt-4.1-mini"))
         temperature = st.slider("작성 온도", min_value=0.0, max_value=1.0, value=0.3, step=0.1)
 
     uploaded_pdf = st.file_uploader("기존 자소서 PDF 업로드", type=["pdf"])
@@ -120,6 +127,8 @@ def main() -> None:
                         job_url=job_url.strip(),
                         llm_backend=llm_backend,
                         hf_token=get_hf_token(),
+                        model_name=backend1_model_name,
+                        temperature=temperature,
                         output_dir=Path("output"),
                     )
 
@@ -128,7 +137,7 @@ def main() -> None:
                         user_profile=user_profile,
                         job_posting=job_posting,
                         provider=research_provider,
-                        model=model_name,
+                        model=writer_model_name,
                         output_dir=Path("output"),
                     )
 
@@ -140,7 +149,7 @@ def main() -> None:
                         company_name=company,
                         team_name=team,
                         role_name=role,
-                        model=model_name,
+                        model=writer_model_name,
                         temperature=temperature,
                         output_dir=Path("output"),
                     )
@@ -177,7 +186,7 @@ def main() -> None:
                     company_name=company_info.get("name", ""),
                     team_name=company_info.get("team", ""),
                     role_name=company_info.get("role", ""),
-                    model=model_name,
+                    model=writer_model_name,
                     temperature=temperature,
                     revision_instruction=revision_instruction,
                     output_dir=Path("output"),

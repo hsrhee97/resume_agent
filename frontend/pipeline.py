@@ -23,13 +23,20 @@ def persist_uploaded_pdf(uploaded_file: Any, output_dir: Path = OUTPUT_DIR) -> P
 def run_schema_extraction(
     pdf_path: str,
     job_url: str,
-    llm_backend: str = "huggingface",
+    llm_backend: str = "openai",
     hf_token: str = "",
+    model_name: str = "",
+    temperature: float = 0.3,
     output_dir: Path = OUTPUT_DIR,
 ) -> tuple[dict[str, Any], dict[str, Any]]:
     from backend1.preprocess_agent import FirstAgent
 
-    agent = FirstAgent(llm_backend=llm_backend, hf_token=hf_token or None)
+    agent = FirstAgent(
+        llm_backend=llm_backend,
+        hf_token=hf_token or None,
+        model_name=model_name,
+        temperature=temperature,
+    )
     result = agent.run(pdf_path=pdf_path, url=job_url, output_dir=str(output_dir))
     user_profile = result.get("profile", {}) if isinstance(result, dict) else {}
     job_posting = result.get("job_posting", {}) if isinstance(result, dict) else {}

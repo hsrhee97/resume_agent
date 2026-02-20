@@ -18,14 +18,19 @@ import os
 import sys
 from datetime import datetime
 
+from dotenv import load_dotenv
+
 # 현재 파일 위치 기준으로 preprocess_agent_app 모듈 경로를 sys.path에 추가
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
 APP_DIR = os.path.join(BASE_DIR, "preprocess_agent_app")
 if APP_DIR not in sys.path:
     sys.path.append(APP_DIR)
 
+# Load API keys and runtime options from .env if present.
+load_dotenv()
+
 from config import PROMPTS, USER_PROFILE_SCHEMA, JOB_POSTING_SCHEMA
-from llm_client import HuggingFaceLLM, OllamaLLM
+from llm_client import HuggingFaceLLM, OllamaLLM, OpenAILLM
 from pdf_parser import extract_text_from_pdf, chunk_text
 from web_crawler import JobPostingCrawler, CompanyResearcher, format_research_for_llm
 
@@ -41,18 +46,35 @@ class FirstAgent:
     두 결과를 결합하면 최종 자소서 생성의 입력이 됨.
     """
 
-    def __init__(self, llm_backend: str = "huggingface", hf_token: str = None):
+    def __init__(
+        self,
+        llm_backend: str = "openai",
+        hf_token: str = None,
+        model_name: str = "",
+        temperature: float = 0.3,
+    ):
         """
         Args:
-            llm_backend: "huggingface" 또는 "ollama"
+            llm_backend: "openai" 또는 "huggingface" 또는 "ollama"
             hf_token: HuggingFace API 토큰 (huggingface 백엔드 사용 시)
+            model_name: 백엔드별 모델명 (openai: gpt-4.1-mini, ollama: qwen2.5 등)
+            temperature: 생성 temperature (openai 백엔드에 주로 적용)
         """
-        if llm_backend == "ollama":
-            self.llm = OllamaLLM(model="mistral")
-            print("🤖 LLM 백엔드: Ollama (로컬)")
+        backend = (llm_backend or "openai").strip().lower()
+        selected_model = (model_name or "").strip()
+
+        if backend == "openai":
+            openai_model = selected_model or os.getenv("OPENAI_MODEL", "gpt-4.1-mini")
+            self.llm = OpenAILLM(model=openai_model, temperature=temperature)
+            print(f"[LLM] OpenAI ({openai_model})")
+        elif backend == "ollama":
+            ollama_model = selected_model or os.getenv("OLLAMA_MODEL", "qwen2.5")
+            self.llm = OllamaLLM(model=ollama_model)
+            print(f"[LLM] Ollama ({ollama_model})")
         else:
-            self.llm = HuggingFaceLLM(api_token=hf_token)
-            print(f"🤖 LLM 백엔드: HuggingFace ({self.llm.model_id})")
+            hf_model = selected_model or os.getenv("HF_MODEL", "")
+            self.llm = HuggingFaceLLM(api_token=hf_token, model_id=hf_model or None)
+            print(f"[LLM] HuggingFace ({self.llm.model_id})")
 
         self.job_crawler = JobPostingCrawler()
         self.researcher = CompanyResearcher()
@@ -374,6 +396,10 @@ def load_existing_profile(json_path: str) -> dict:
 # CLI 엔트리포인트
 # ============================================================
 def main():
+    backend_default = os.getenv("BACKEND1_LLM_BACKEND", "openai").strip().lower()
+    if backend_default not in ("openai", "huggingface", "ollama"):
+        backend_default = "openai"
+
     parser = argparse.ArgumentParser(
         description="자소서 생성 에이전트: PDF/URL → JSON 추출"
     )
@@ -383,9 +409,21 @@ def main():
     parser.add_argument(
         "--backend",
         type=str,
-        choices=["huggingface", "ollama"],
-        default="huggingface",
+        choices=["openai", "huggingface", "ollama"],
+        default=backend_default,
         help="LLM 백엔드 선택",
+    )
+    parser.add_argument(
+        "--model",
+        type=str,
+        default=os.getenv("BACKEND1_MODEL", ""),
+        help="백엔드별 모델명 (예: gpt-4.1-mini, qwen2.5)",
+    )
+    parser.add_argument(
+        "--temperature",
+        type=float,
+        default=float(os.getenv("BACKEND1_TEMPERATURE", "0.3")),
+        help="생성 temperature (기본 0.3)",
     )
     parser.add_argument("--hf-token", type=str, help="HuggingFace API 토큰")
     parser.add_argument(
@@ -405,6 +443,8 @@ def main():
     agent = FirstAgent(
         llm_backend=args.backend,
         hf_token=args.hf_token,
+        model_name=args.model,
+        temperature=args.temperature,
     )
 
     # 기존 프로필 사용 모드
